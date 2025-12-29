@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Grades - Faculty LMS</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: white !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            padding: 16px 0;
+            border-bottom: 1px solid #d1d7dc;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: #1c1d1f !important;
+            font-size: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .main-container {
+            padding: 32px 0;
+        }
+        
+        .layout-wrapper {
+            display: flex;
+            gap: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .sidebar {
+            width: 240px;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-nav {
+            background: white;
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 24px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #1c1d1f;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-bottom: 4px;
+            position: relative;
+        }
+        
+        .nav-item:hover {
+            background: #f7f9fa;
+            color: #a435f0;
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            color: white;
+        }
+        
+        .nav-item i {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            flex: 1;
+            min-width: 0;
+            max-width: 900px;
+        }
+        
+        .right-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 24px;
+        }
+        
+        .sidebar-card-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #050505;
+            margin-bottom: 16px;
+        }
+        
+        /* Semester Toggle Buttons */
+        .semester-toggle {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .semester-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 14px 18px;
+            background: white;
+            border: 2px solid #e4e6eb;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1c1d1f;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .semester-btn i {
+            font-size: 18px;
+            color: #6a6f73;
+            transition: color 0.3s ease;
+        }
+        
+        .semester-btn:hover {
+            background: #f7f9fa;
+            border-color: #a435f0;
+            transform: translateX(4px);
+        }
+        
+        .semester-btn.active {
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            border-color: #a435f0;
+            color: white;
+            box-shadow: 0 4px 12px rgba(164, 53, 240, 0.3);
+        }
+        
+        .semester-btn.active i {
+            color: white;
+        }
+        
+        /* Assignment Cards */
+        .assignment-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #d1d7dc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .assignment-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            border-color: #a435f0;
+        }
+        
+        .assignment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+        
+        .assignment-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1c1d1f;
+            margin-bottom: 4px;
+        }
+        
+        .assignment-subtitle {
+            font-size: 14px;
+            color: #6a6f73;
+        }
+        
+        .assignment-badge {
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .assignment-meta {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e4e6eb;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #6a6f73;
+        }
+        
+        .meta-item i {
+            color: #a435f0;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            background: white;
+            border-radius: 8px;
+            padding: 64px 24px;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .empty-state i {
+            font-size: 64px;
+            color: #bcc0c4;
+            margin-bottom: 16px;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1c1d1f;
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 1200px) {
+            .layout-wrapper {
+                flex-direction: column;
+            }
+            
+            .sidebar, .right-sidebar {
+                width: 100%;
+            }
+            
+            .sidebar-nav, .sidebar-card {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+            <a class="navbar-brand" href="/teacher/dashboard">
+                <i class="fas fa-graduation-cap"></i> Faculty LMS
+            </a>
+            <div class="user-info">
+                <div class="user-avatar" th:text="${user.firstName != null ? user.firstName.substring(0,1).toUpperCase() + user.lastName.substring(0,1).toUpperCase() : 'T'}">T</div>
+                <div>
+                    <div style="font-weight: 600; color: #1c1d1f; font-size: 14px;" th:text="${user.firstName + ' ' + user.lastName}">Teacher Name</div>
+                    <div style="font-size: 12px; color: #6a6f73;">Teacher</div>
+                </div>
+                <form th:action="@{/logout}" method="post" style="margin: 0 0 0 16px;">
+                    <button type="submit" class="btn btn-sm btn-outline-dark">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+            <div class="layout-wrapper">
+                <!-- Left Sidebar -->
+                <aside class="sidebar">
+                    <div class="sidebar-nav">
+                        <a href="/teacher/dashboard" class="nav-item">
+                            <i class="fas fa-stream"></i>
+                            <span>My Feed</span>
+                        </a>
+                        <a href="/teacher/posts/new" class="nav-item">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Create Post</span>
+                        </a>
+                        <a href="/teacher/grades" class="nav-item active">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Manage Grades</span>
+                        </a>
+                    </div>
+                </aside>
+                
+                <!-- Main Content -->
+                <div class="main-content">
+                    <h2 style="font-size: 28px; font-weight: 700; color: #1c1d1f; margin-bottom: 24px;">
+                        <i class="fas fa-chart-line" style="color: #a435f0;"></i> Manage Grades
+                    </h2>
+                    
+                    <!-- Empty State -->
+                    <div th:if="${assignments == null || assignments.isEmpty()}" class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>No Assignments</h3>
+                        <p style="color: #65676b; margin-top: 8px;">You don't have any subject assignments for this semester</p>
+                    </div>
+                    
+                    <!-- Assignment Cards (Filtered by Semester) -->
+                    <div th:if="${assignments != null && !assignments.isEmpty()}">
+                        <div th:each="assignment : ${assignments}" 
+                             class="assignment-card"
+                             th:attr="data-semester=${assignment.semester},data-assignment-id=${assignment.id},data-group-id=${assignment.group != null ? assignment.group.id : 'null'},data-subject-name=${assignment.subject.name},data-group-name=${assignment.group != null ? assignment.group.name : 'All Groups'}"
+                             onclick="showGradeModalFromData(this)">
+                            <div class="assignment-header">
+                                <div>
+                                    <div class="assignment-title" th:text="${assignment.subject.name}">Subject Name</div>
+                                    <div class="assignment-subtitle" th:text="${assignment.studentClass.name}">Class Name</div>
+                                </div>
+                                <div class="assignment-badge" th:text="'Semester ' + ${assignment.semester}">Semester 1</div>
+                            </div>
+                            <div class="assignment-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-users"></i>
+                                    <span th:text="${assignment.group != null ? assignment.group.name : 'All Groups'}">Group 1</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-code"></i>
+                                    <span th:text="${assignment.subject.code}">SUB101</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>Coef: <span th:text="${assignment.subject.coefficient}">3</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Sidebar -->
+                <aside class="right-sidebar">
+                    <!-- Academic Year Display -->
+                    <div class="sidebar-card">
+                        <div class="sidebar-card-title">
+                            <i class="fas fa-calendar-alt me-2"></i>Academic Year
+                        </div>
+                        <div style="font-size: 20px; font-weight: 700; color: #a435f0; text-align: center; padding: 12px; background: linear-gradient(135deg, #f7f9fa 0%, #ffffff 100%); border-radius: 8px; margin-top: 12px;" th:text="${selectedYear}">
+                            2024-2025
+                        </div>
+                    </div>
+                    
+                    <!-- Semester Toggle -->
+                    <div class="sidebar-card">
+                        <div class="sidebar-card-title">
+                            <i class="fas fa-toggle-on me-2"></i>Select Semester
+                        </div>
+                        <div class="semester-toggle mt-3">
+                            <button class="semester-btn active" data-semester="1" onclick="toggleSemester(1)">
+                                <i class="fas fa-book"></i>
+                                <span>Semester 1</span>
+                            </button>
+                            <button class="semester-btn" data-semester="2" onclick="toggleSemester(2)">
+                                <i class="fas fa-book-open"></i>
+                                <span>Semester 2</span>
+                            </button>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Grade Management Modal -->
+    <div class="modal fade" id="gradeModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%); color: white;">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit"></i> 
+                        <span id="modalTitle">Subject - Group</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        let gradeModal;
+        let currentAssignmentId = null;
+        let currentGroupId = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            gradeModal = new bootstrap.Modal(document.getElementById('gradeModal'));
+            
+            // Initialize semester filter
+            toggleSemester(1);
+        });
+        
+        function toggleSemester(semester) {
+            // Update button states
+            document.querySelectorAll('.semester-btn').forEach(btn => {
+                const btnSem = parseInt(btn.getAttribute('data-semester'));
+                if (btnSem === semester) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Filter assignment cards
+            document.querySelectorAll('.assignment-card').forEach(card => {
+                const cardSem = parseInt(card.getAttribute('data-semester'));
+                card.style.display = (cardSem === semester) ? 'block' : 'none';
+            });
+        }
+        
+        // Wrapper function to read data attributes and call showGradeModal
+        function showGradeModalFromData(element) {
+            const assignmentId = element.getAttribute('data-assignment-id');
+            const groupId = element.getAttribute('data-group-id');
+            const subjectName = element.getAttribute('data-subject-name');
+            const groupName = element.getAttribute('data-group-name');
+            showGradeModal(assignmentId, groupId, subjectName, groupName);
+        }
+        
+        function showGradeModal(assignmentId, groupId, subjectName, groupName) {
+            currentAssignmentId = assignmentId;
+            currentGroupId = groupId !== 'null' ? groupId : null;
+            document.getElementById('modalTitle').textContent = subjectName + ' - ' + groupName;
+            
+            // Clear any pending updates from previous modal
+            gradeUpdates.clear();
+            
+            // Show modal
+            gradeModal.show();
+            
+            // Load students and grades
+            loadStudentGrades(assignmentId, currentGroupId);
+        }
+        
+        function loadStudentGrades(assignmentId, groupId) {
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"><span class="visually-hidden">Loading...</span></div></div>';
+            
+            let url = '/api/grades/assignment/' + assignmentId + '/students';
+            if (groupId) {
+                url += '?groupId=' + groupId;
+            }
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(grades => {
+                    renderGradesTable(grades);
+                })
+                .catch(error => {
+                    modalBody.innerHTML = '<div class="alert alert-danger">Error loading grades: ' + error.message + '</div>';
+                });
+        }
+        
+        function renderGradesTable(grades) {
+            const modalBody = document.getElementById('modalBody');
+            
+            if (grades.length === 0) {
+                modalBody.innerHTML = '<div class="alert alert-info">No students found in this group.</div>';
+                return;
+            }
+            
+            let html = `
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead style="background: #f7f9fa;">
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Student Name</th>
+                                <th style="width: 120px;">Exam (/ 20)</th>
+                                <th style="width: 120px;">TD (/ 20)</th>
+                                <th style="width: 120px;">TP (/ 20)</th>
+                                <th style="width: 100px;">Final</th>
+                                <th style="width: 80px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            grades.forEach(grade => {
+                const finalGrade = grade.finalGrade !== null ? grade.finalGrade.toFixed(2) : '-';
+                const finalClass = grade.finalGrade !== null && grade.finalGrade >= 10 ? 'text-success fw-bold' : (grade.finalGrade !== null ? 'text-danger fw-bold' : '');
+                
+                html += `
+                    <tr data-grade-id="${grade.id}">
+                        <td><strong>${grade.studentIdNumber || 'N/A'}</strong></td>
+                        <td>${grade.studentName || 'Student ' + grade.id}</td>
+                        <td><input type="number" class="form-control form-control-sm" step="0.25" min="0" max="20" value="${grade.examen || ''}" onchange="updateGrade(${grade.id}, 'examen', this.value)"></td>
+                        <td><input type="number" class="form-control form-control-sm" step="0.25" min="0" max="20" value="${grade.td || ''}" onchange="updateGrade(${grade.id}, 'td', this.value)"></td>
+                        <td><input type="number" class="form-control form-control-sm" step="0.25" min="0" max="20" value="${grade.tp || ''}" onchange="updateGrade(${grade.id}, 'tp', this.value)"></td>
+                        <td class="${finalClass}">${finalGrade}</td>
+                        <td><button class="btn btn-sm btn-primary" onclick="saveGrade(${grade.id})"><i class="fas fa-save"></i></button></td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-3 text-end">
+                    <button class="btn btn-success" onclick="saveAllGrades()">
+                        <i class="fas fa-save"></i> Save All Grades
+                    </button>
+                </div>
+            `;
+            
+            modalBody.innerHTML = html;
+        }
+        
+        const gradeUpdates = new Map();
+        
+        function updateGrade(gradeId, field, value) {
+            if (!gradeUpdates.has(gradeId)) {
+                gradeUpdates.set(gradeId, {});
+            }
+            gradeUpdates.get(gradeId)[field] = value !== '' ? parseFloat(value) : null;
+        }
+        
+        function saveGrade(gradeId) {
+            const updates = gradeUpdates.get(gradeId);
+            if (!updates) {
+                alert('No changes to save');
+                return;
+            }
+            
+            fetch('/api/grades/' + gradeId, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(updates)
+            })
+            .then(response => response.json())
+            .then(() => {
+                gradeUpdates.delete(gradeId);
+                loadStudentGrades(currentAssignmentId, currentGroupId);
+                showToast('Grade saved successfully!');
+            })
+            .catch(error => alert('Error saving grade: ' + error.message));
+        }
+        
+        function saveAllGrades() {
+            if (gradeUpdates.size === 0) {
+                alert('No changes to save');
+                return;
+            }
+            
+            const promises = [];
+            gradeUpdates.forEach((updates, gradeId) => {
+                promises.push(
+                    fetch('/api/grades/' + gradeId, {
+                        method: 'PUT',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(updates)
+                    })
+                );
+            });
+            
+            Promise.all(promises)
+                .then(() => {
+                    gradeUpdates.clear();
+                    loadStudentGrades(currentAssignmentId, currentGroupId);
+                    showToast('All grades saved successfully!');
+                })
+                .catch(error => alert('Error saving grades: ' + error.message));
+        }
+        
+        function showToast(message) {
+            // Simple toast notification
+            const toast = document.createElement('div');
+            toast.className = 'alert alert-success position-fixed top-0 end-0 m-3';
+            toast.style.zIndex = '9999';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

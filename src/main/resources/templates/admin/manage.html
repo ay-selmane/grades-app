@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Management - Faculty LMS</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f7f9fa; min-height: 100vh; }
+        .navbar { background: white !important; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); padding: 16px 0; border-bottom: 1px solid #d1d7dc; }
+        .navbar-brand { font-weight: 700; color: #1c1d1f !important; font-size: 20px; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px; }
+        .main-container { padding: 32px 0; }
+        .page-header { background: white; border-radius: 12px; padding: 32px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); border: 1px solid #d1d7dc; }
+        .page-header h1 { font-size: 32px; font-weight: 700; color: #1c1d1f; margin-bottom: 8px; }
+        .section { background: white; border-radius: 12px; padding: 32px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); border: 1px solid #d1d7dc; }
+        .section-title { font-size: 24px; font-weight: 700; color: #1c1d1f; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #f7f9fa; display: flex; justify-content: space-between; align-items: center; }
+        .btn-add { background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(164, 53, 240, 0.25); }
+        .btn-add:hover { background: linear-gradient(135deg, #8710d8 0%, #6b0ab0 100%); box-shadow: 0 4px 12px rgba(164, 53, 240, 0.35); transform: translateY(-2px); color: white; }
+        .btn-back { background: linear-gradient(135deg, #2d2f31 0%, #1c1d1f 100%); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; transition: all 0.2s ease; font-size: 14px; text-decoration: none; display: inline-block; }
+        .btn-back:hover { background: linear-gradient(135deg, #1c1d1f 0%, #000000 100%); box-shadow: 0 4px 12px rgba(28, 29, 31, 0.3); transform: translateY(-2px); color: white; }
+        
+        .nav-tabs { border-bottom: 2px solid #d1d7dc; margin-bottom: 24px; }
+        .nav-tabs .nav-link { border: none; color: #6a6f73; font-weight: 600; padding: 12px 24px; transition: all 0.2s ease; }
+        .nav-tabs .nav-link:hover { color: #a435f0; background: #f7f9fa; }
+        .nav-tabs .nav-link.active { color: #a435f0; border-bottom: 3px solid #a435f0; background: transparent; }
+        
+        .search-box { margin-bottom: 20px; }
+        .search-box input { border-radius: 8px; border: 1px solid #d1d7dc; padding: 12px 15px; transition: all 0.2s ease; width: 100%; max-width: 400px; }
+        .search-box input:focus { border-color: #a435f0; box-shadow: 0 0 0 4px rgba(164, 53, 240, 0.1); outline: none; }
+        
+        table { width: 100%; }
+        thead { background: #f7f9fa; }
+        thead th { padding: 16px; font-weight: 700; color: #1c1d1f; border-bottom: 2px solid #d1d7dc; font-size: 14px; cursor: pointer; user-select: none; }
+        thead th:hover { background: #e8eaed; }
+        thead th i { margin-left: 8px; font-size: 12px; color: #6a6f73; }
+        tbody td { padding: 16px; border-bottom: 1px solid #f7f9fa; vertical-align: middle; color: #2d2f31; }
+        tbody tr:hover { background: #f7f9fa; }
+        
+        .badge-custom { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; }
+        .badge-department { background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); color: #1565c0; }
+        .badge-class { background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); color: #6a1b9a; }
+        .badge-group { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); color: #2e7d32; }
+        
+        .btn-sm-action { padding: 8px 16px; font-size: 13px; border-radius: 6px; border: none; cursor: pointer; transition: all 0.2s ease; margin-right: 8px; font-weight: 600; }
+        .btn-edit { background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%); color: white; box-shadow: 0 2px 6px rgba(76, 175, 80, 0.2); }
+        .btn-edit:hover { background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%); box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3); transform: translateY(-1px); }
+        
+        .empty-state { text-align: center; padding: 64px 24px; }
+        .empty-state i { font-size: 64px; color: #d1d7dc; margin-bottom: 16px; }
+        .empty-state h3 { color: #6a6f73; font-weight: 600; font-size: 18px; }
+        
+        .modal-content { border-radius: 12px; border: none; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15); }
+        .modal-header { background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%); color: white; border-radius: 12px 12px 0 0; padding: 24px 32px; border: none; }
+        .modal-title { font-weight: 700; }
+        .modal-body { padding: 32px; }
+        .form-label { font-weight: 700; color: #1c1d1f; margin-bottom: 8px; font-size: 14px; }
+        .form-control, .form-select { border-radius: 8px; border: 1px solid #d1d7dc; padding: 12px 15px; transition: all 0.2s ease; }
+        .form-control:focus, .form-select:focus { border-color: #a435f0; box-shadow: 0 0 0 4px rgba(164, 53, 240, 0.1); }
+        .btn-close-white { filter: brightness(0) invert(1); }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="/admin/dashboard"><i class="fas fa-user-shield"></i> Faculty LMS</a>
+            <div class="d-flex">
+                <a href="/admin/dashboard" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="main-container">
+        <div class="container">
+            <div class="page-header">
+                <h1><i class="fas fa-cogs" style="color: #a435f0;"></i> System Management</h1>
+                <p style="color: #6a6f73; font-size: 16px; margin: 0;">Manage all system entities</p>
+            </div>
+            
+            <div class="section">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#departments">
+                            <i class="fas fa-building"></i> Departments
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#classes">
+                            <i class="fas fa-graduation-cap"></i> Classes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#subjects">
+                            <i class="fas fa-book"></i> Subjects
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#groups">
+                            <i class="fas fa-users"></i> Groups
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#students">
+                            <i class="fas fa-user-graduate"></i> Students
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#teachers">
+                            <i class="fas fa-chalkboard-teacher"></i> Teachers
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="tab-content">
+                    <!-- Departments Tab -->
+                    <div class="tab-pane fade show active" id="departments">
+                        <div class="section-title">
+                            <span><i class="fas fa-building" style="color: #a435f0;"></i> Departments</span>
+                            <button class="btn-add" onclick="showAddDepartmentModal()">
+                                <i class="fas fa-plus"></i> Add Department
+                            </button>
+                        </div>
+                        <div class="search-box">
+                            <input type="text" id="deptSearch" placeholder="🔍 Search departments..." onkeyup="filterTable('deptSearch', 'departmentsTable')">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th onclick="sortTable('departmentsTable', 0)">Code <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('departmentsTable', 1)">Name <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('departmentsTable', 2)">Description <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('departmentsTable', 3)">Head of Department <i class="fas fa-sort"></i></th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="departmentsTable">
+                                    <tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Classes Tab -->
+                    <div class="tab-pane fade" id="classes">
+                        <div class="section-title">
+                            <span><i class="fas fa-graduation-cap" style="color: #a435f0;"></i> Classes</span>
+                            <button class="btn-add" onclick="showAddClassModal()">
+                                <i class="fas fa-plus"></i> Add Class
+                            </button>
+                        </div>
+                        <div class="search-box">
+                            <input type="text" id="classSearch" placeholder="🔍 Search classes..." onkeyup="filterTable('classSearch', 'classesTable')">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th onclick="sortTable('classesTable', 0)">Name <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('classesTable', 1)">Level <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('classesTable', 2)">Department <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('classesTable', 3)">Academic Year <i class="fas fa-sort"></i></th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="classesTable">
+                                    <tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Subjects Tab -->
+                    <div class="tab-pane fade" id="subjects">
+                        <div class="section-title">
+                            <span><i class="fas fa-book" style="color: #a435f0;"></i> Subjects</span>
+                            <button class="btn-add" onclick="showAddSubjectModal()">
+                                <i class="fas fa-plus"></i> Add Subject
+                            </button>
+                        </div>
+                        <div class="search-box">
+                            <input type="text" id="subjectSearch" placeholder="🔍 Search subjects..." onkeyup="filterTable('subjectSearch', 'subjectsTable')">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th onclick="sortTable('subjectsTable', 0)">Code <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('subjectsTable', 1)">Name <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('subjectsTable', 2)">Credit Hours <i class="fas fa-sort"></i></th>
+                                        <th>Description</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="subjectsTable">
+                                    <tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Groups Tab -->
+                    <div class="tab-pane fade" id="groups">
+                        <div class="section-title">
+                            <span><i class="fas fa-users" style="color: #a435f0;"></i> Groups</span>
+                            <button class="btn-add" onclick="showAddGroupModal()">
+                                <i class="fas fa-plus"></i> Add Group
+                            </button>
+                        </div>
+                        <div class="search-box">
+                            <input type="text" id="groupSearch" placeholder="🔍 Search groups..." onkeyup="filterTable('groupSearch', 'groupsTable')">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th onclick="sortTable('groupsTable', 0)">Group Name <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('groupsTable', 1)">Class <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('groupsTable', 2)">Capacity <i class="fas fa-sort"></i></th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="groupsTable">
+                                    <tr><td colspan="4" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Students Tab -->
+                    <div class="tab-pane fade" id="students">
+                        <div class="section-title">
+                            <span><i class="fas fa-user-graduate" style="color: #a435f0;"></i> Students</span>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn-add" onclick="showAddStudentModal()">
+                                    <i class="fas fa-plus"></i> Add Student
+                                </button>
+                                <button class="btn-add" onclick="downloadStudentTemplate()" style="background: #28a745;">
+                                    <i class="fas fa-download"></i> Download Template
+                                </button>
+                                <button class="btn-add" onclick="document.getElementById('studentExcelUpload').click()" style="background: #17a2b8;">
+                                    <i class="fas fa-upload"></i> Import Excel
+                                </button>
+                                <input type="file" id="studentExcelUpload" accept=".xlsx" style="display: none;" onchange="handleStudentExcelUpload(event)">
+                            </div>
+                        </div>
+                        <div class="search-box">
+                            <input type="text" id="studentSearch" placeholder="🔍 Search students..." onkeyup="filterTable('studentSearch', 'studentsTable')">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th onclick="sortTable('studentsTable', 0)">Student ID <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('studentsTable', 1)">Name <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('studentsTable', 2)">Email <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('studentsTable', 3)">Username <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('studentsTable', 4)">Department <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('studentsTable', 5)">Class <i class="fas fa-sort"></i></th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentsTable">
+                                    <tr><td colspan="7" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Teachers Tab -->
+                    <div class="tab-pane fade" id="teachers">
+                        <div class="section-title">
+                            <span><i class="fas fa-chalkboard-teacher" style="color: #a435f0;"></i> Teachers</span>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn-add" onclick="showAddTeacherModal()">
+                                    <i class="fas fa-plus"></i> Add Teacher
+                                </button>
+                                <button class="btn-add" onclick="downloadTeacherTemplate()" style="background: #28a745;">
+                                    <i class="fas fa-download"></i> Download Template
+                                </button>
+                                <button class="btn-add" onclick="document.getElementById('teacherExcelUpload').click()" style="background: #17a2b8;">
+                                    <i class="fas fa-upload"></i> Import Excel
+                                </button>
+                                <input type="file" id="teacherExcelUpload" accept=".xlsx" style="display: none;" onchange="handleTeacherExcelUpload(event)">
+                            </div>
+                        </div>
+                        <div class="search-box">
+                            <input type="text" id="teacherSearch" placeholder="🔍 Search teachers..." onkeyup="filterTable('teacherSearch', 'teachersTable')">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th onclick="sortTable('teachersTable', 0)">Name <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('teachersTable', 1)">Email <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('teachersTable', 2)">Username <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('teachersTable', 3)">Department <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('teachersTable', 4)">Specialization <i class="fas fa-sort"></i></th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="teachersTable">
+                                    <tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals Container -->
+    <div id="modalsContainer"></div>
+    
+    <!-- Import Preview Modal -->
+    <div class="modal fade" id="importPreviewModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importPreviewTitle">Import Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="importSummary" class="mb-3"></div>
+                    <div id="importErrors" class="mb-3"></div>
+                    <div id="importPreviewTable"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmImportBtn" onclick="confirmImport()" disabled>
+                        <i class="fas fa-check"></i> Import Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentData = { departments: [], classes: [], subjects: [], groups: [], students: [], teachers: [] };
+        let pendingImportResult = null;
+        let importType = null; // 'student' or 'teacher'
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllData();
+        });
+        
+        async function loadAllData() {
+            await Promise.all([
+                loadDepartments(),
+                loadClasses(),
+                loadSubjects(),
+                loadGroups(),
+                loadStudents(),
+                loadTeachers()
+            ]);
+            createModals();
+        }
+        
+        // Filter table function
+        function filterTable(searchId, tableId) {
+            const input = document.getElementById(searchId);
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById(tableId);
+            const tr = table.getElementsByTagName('tr');
+            
+            for (let i = 0; i < tr.length; i++) {
+                let txtValue = tr[i].textContent || tr[i].innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = '';
+                } else {
+                    tr[i].style.display = 'none';
+                }
+            }
+        }
+        
+        // Sort table function
+        function sortTable(tableId, column) {
+            const table = document.getElementById(tableId);
+            let rows = Array.from(table.rows);
+            let dir = table.dataset.sortDir === 'asc' ? 'desc' : 'asc';
+            table.dataset.sortDir = dir;
+            
+            rows.sort((a, b) => {
+                let aValue = a.cells[column].textContent.trim();
+                let bValue = b.cells[column].textContent.trim();
+                
+                if (dir === 'asc') {
+                    return aValue.localeCompare(bValue);
+                } else {
+                    return bValue.localeCompare(aValue);
+                }
+            });
+            
+            rows.forEach(row => table.appendChild(row));
+        }
+        
+        async function loadDepartments() {
+            try {
+                const response = await fetch('/api/departments', { credentials: 'include' });
+                currentData.departments = await response.json();
+                
+                const tbody = document.getElementById('departmentsTable');
+                if (currentData.departments.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-building"></i><h3>No departments yet</h3></td></tr>';
+                } else {
+                    tbody.innerHTML = currentData.departments.map(dept => `
+                        <tr>
+                            <td>${dept.code}</td>
+                            <td><strong>${dept.name}</strong></td>
+                            <td>${dept.description || '-'}</td>
+                            <td>${dept.headOfDepartmentName || 'Not Assigned'}</td>
+                            <td>
+                                <button class="btn-sm-action btn-edit" onclick="editDepartment(${dept.id})">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading departments:', error);
+            }
+        }
+        
+        async function loadClasses() {
+            try {
+                const response = await fetch('/api/classes', { credentials: 'include' });
+                currentData.classes = await response.json();
+                
+                const tbody = document.getElementById('classesTable');
+                if (currentData.classes.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-graduation-cap"></i><h3>No classes yet</h3></td></tr>';
+                } else {
+                    tbody.innerHTML = currentData.classes.map(cls => `
+                        <tr>
+                            <td><strong>${cls.name}</strong></td>
+                            <td><span class="badge-custom badge-class">${cls.level || '-'}</span></td>
+                            <td><span class="badge-custom badge-department">${cls.department ? cls.department.name : '-'}</span></td>
+                            <td>${cls.academicYear || '-'}</td>
+                            <td>
+                                <button class="btn-sm-action btn-edit" onclick="editClass(${cls.id})">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading classes:', error);
+            }
+        }
+        
+        async function loadSubjects() {
+            try {
+                const response = await fetch('/api/subjects', { credentials: 'include' });
+                currentData.subjects = await response.json();
+                
+                const tbody = document.getElementById('subjectsTable');
+                if (currentData.subjects.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-book"></i><h3>No subjects yet</h3><p>Create subjects to assign to classes</p></td></tr>';
+                } else {
+                    tbody.innerHTML = currentData.subjects.map(subject => `
+                        <tr>
+                            <td><strong>${subject.code}</strong></td>
+                            <td>${subject.name}</td>
+                            <td><span class="badge-custom" style="background:#e7f3ff; color:#1877f2;">${subject.creditHours || '-'}</span></td>
+                            <td>${subject.description || '-'}</td>
+                            <td>
+                                <button class="btn-sm-action btn-edit" onclick="editSubject(${subject.id})">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading subjects:', error);
+            }
+        }
+        
+        async function loadGroups() {
+            try {
+                const response = await fetch('/api/groups', { credentials: 'include' });
+                currentData.groups = await response.json();
+                
+                const tbody = document.getElementById('groupsTable');
+                if (currentData.groups.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-users"></i><h3>No groups yet</h3></td></tr>';
+                } else {
+                    tbody.innerHTML = currentData.groups.map(grp => `
+                        <tr>
+                            <td><strong>${grp.name}</strong></td>
+                            <td><span class="badge-custom badge-class">${grp.studentClass ? grp.studentClass.name : '-'}</span></td>
+                            <td>${grp.capacity || 30}</td>
+                            <td>
+                                <button class="btn-sm-action btn-edit" onclick="editGroup(${grp.id})">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading groups:', error);
+            }
+        }
+        
+        async function loadStudents() {
+            try {
+                const response = await fetch('/api/students', { credentials: 'include' });
+                currentData.students = await response.json();
+                
+                const tbody = document.getElementById('studentsTable');
+                if (currentData.students.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-user-graduate"></i><h3>No students yet</h3></td></tr>';
+                } else {
+                    tbody.innerHTML = currentData.students.map(student => `
+                        <tr>
+                            <td>${student.studentId}</td>
+                            <td><strong>${student.user.firstName} ${student.user.lastName}</strong></td>
+                            <td>${student.user.email}</td>
+                            <td>${student.user.username}</td>
+                            <td><span class="badge-custom badge-department">${student.department ? student.department.name : '-'}</span></td>
+                            <td><span class="badge-custom badge-class">${student.studentClass ? student.studentClass.name : '-'}</span></td>
+                            <td>
+                                <button class="btn-sm-action btn-edit" onclick="editStudent(${student.id})">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading students:', error);
+            }
+        }
+        
+        async function loadTeachers() {
+            try {
+                const response = await fetch('/api/teachers', { credentials: 'include' });
+                currentData.teachers = await response.json();
+                
+                const tbody = document.getElementById('teachersTable');
+                if (currentData.teachers.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-chalkboard-teacher"></i><h3>No teachers yet</h3></td></tr>';
+                } else {
+                    tbody.innerHTML = currentData.teachers.map(teacher => `
+                        <tr>
+                            <td><strong>${teacher.firstName} ${teacher.lastName}</strong></td>
+                            <td>${teacher.email}</td>
+                            <td>${teacher.username}</td>
+                            <td><span class="badge-custom badge-department">${teacher.departmentId ? currentData.departments.find(d => d.id === teacher.departmentId)?.name || '-' : '-'}</span></td>
+                            <td>${teacher.specialization || '-'}</td>
+                            <td>
+                                <button class="btn-sm-action btn-edit" onclick="editTeacher(${teacher.id})">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading teachers:', error);
+            }
+        }
+        
+        function createModals() {
+            const container = document.getElementById('modalsContainer');
+            if (!container) return;
+            
+            let teacherOptions = '';
+            for (let i = 0; i < currentData.teachers.length; i++) {
+                const t = currentData.teachers[i];
+                teacherOptions += '<option value="' + t.id + '">' + t.firstName + ' ' + t.lastName + '</option>';
+            }
+            
+            let deptOptions = '';
+            for (let i = 0; i < currentData.departments.length; i++) {
+                const d = currentData.departments[i];
+                deptOptions += '<option value="' + d.id + '">' + d.name + '</option>';
+            }
+            
+            let classOptions = '';
+            for (let i = 0; i < currentData.classes.length; i++) {
+                const c = currentData.classes[i];
+                classOptions += '<option value="' + c.id + '">' + c.name + '</option>';
+            }
+            
+            let groupOptions = '';
+            for (let i = 0; i < currentData.groups.length; i++) {
+                const g = currentData.groups[i];
+                groupOptions += '<option value="' + g.id + '">' + g.name + '</option>';
+            }
+            
+            container.innerHTML = `
+                <!-- Department Modal -->
+                <div class="modal fade" id="departmentModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="departmentModalTitle">Add Department</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="departmentForm" onsubmit="saveDepartment(event)">
+                                    <input type="hidden" id="departmentId">
+                                    <div class="mb-3">
+                                        <label class="form-label">Code</label>
+                                        <input type="text" class="form-control" id="deptCode" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Name</label>
+                                        <input type="text" class="form-control" id="deptName" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Description</label>
+                                        <textarea class="form-control" id="deptDescription" rows="3"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Head of Department</label>
+                                        <select class="form-select" id="deptHodId">
+                                            <option value="">Select Teacher (Optional)</option>
+                                            ${teacherOptions}
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn-add w-100"><i class="fas fa-save"></i> Save Department</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Class Modal -->
+                <div class="modal fade" id="classModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="classModalTitle">Add Class</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="classForm" onsubmit="saveClass(event)">
+                                    <input type="hidden" id="classId">
+                                    <div class="mb-3">
+                                        <label class="form-label">Class Name</label>
+                                        <input type="text" class="form-control" id="className" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Level</label>
+                                        <input type="text" class="form-control" id="classLevel" placeholder="e.g., L1, L2, L3">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Academic Year</label>
+                                        <input type="text" class="form-control" id="classYear" placeholder="e.g., 2024-2025">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Department</label>
+                                        <select class="form-select" id="classDeptId" required>
+                                            <option value="">Select Department</option>
+                                            ${deptOptions}
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Assign Subjects</label>
+                                        <ul class="nav nav-tabs" role="tablist">
+                                            <li class="nav-item">
+                                                <a class="nav-link active" data-bs-toggle="tab" href="#classSem1Subjects">Semester 1</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-bs-toggle="tab" href="#classSem2Subjects">Semester 2</a>
+                                            </li>
+                                        </ul>
+                                        <div class="tab-content border border-top-0 p-3" style="max-height: 300px; overflow-y: auto;">
+                                            <div id="classSem1Subjects" class="tab-pane fade show active">
+                                                <div id="semester1SubjectsList"></div>
+                                            </div>
+                                            <div id="classSem2Subjects" class="tab-pane fade">
+                                                <div id="semester2SubjectsList"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn-add w-100"><i class="fas fa-save"></i> Save Class</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Subject Modal -->
+                <div class="modal fade" id="subjectModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="subjectModalTitle">Add Subject</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="subjectForm" onsubmit="saveSubject(event)">
+                                    <input type="hidden" id="subjectId">
+                                    <div class="mb-3">
+                                        <label class="form-label">Subject Name</label>
+                                        <input type="text" class="form-control" id="subjectName" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Code</label>
+                                        <input type="text" class="form-control" id="subjectCode" required placeholder="e.g., ALG101">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Credit Hours</label>
+                                        <input type="number" class="form-control" id="subjectCreditHours" placeholder="e.g., 3">
+                                        <small class="text-muted">Coefficient will be set when assigning to classes</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Description</label>
+                                        <textarea class="form-control" id="subjectDescription" rows="3"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn-add w-100"><i class="fas fa-save"></i> Save Subject</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Group Modal -->
+                <div class="modal fade" id="groupModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="groupModalTitle">Add Group</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="groupForm" onsubmit="saveGroup(event)">
+                                    <input type="hidden" id="groupId">
+                                    <div class="mb-3">
+                                        <label class="form-label">Group Name</label>
+                                        <input type="text" class="form-control" id="groupName" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Capacity</label>
+                                        <input type="number" class="form-control" id="groupCapacity" value="30">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Class</label>
+                                        <select class="form-select" id="groupClassId" required>
+                                            <option value="">Select Class</option>
+                                            ${classOptions}
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn-add w-100"><i class="fas fa-save"></i> Save Group</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Student Modal -->
+                <div class="modal fade" id="studentModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="studentModalTitle">Add Student</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="studentForm" onsubmit="saveStudent(event)">
+                                    <input type="hidden" id="studentDbId">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Student ID</label>
+                                            <input type="text" class="form-control" id="studentId" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Username</label>
+                                            <input type="text" class="form-control" id="studentUsername" required>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">First Name</label>
+                                            <input type="text" class="form-control" id="studentFirstName" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Last Name</label>
+                                            <input type="text" class="form-control" id="studentLastName" required>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="studentEmail" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Password</label>
+                                        <input type="password" class="form-control" id="studentPassword" required>
+                                        <small style="color: #6a6f73;">Leave blank when editing to keep current password</small>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">Department</label>
+                                            <select class="form-select" id="studentDeptId" required>
+                                                <option value="">Select Department</option>
+                                                ${deptOptions}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">Class</label>
+                                            <select class="form-select" id="studentClassId" onchange="filterStudentGroups()" required>
+                                                <option value="">Select Class</option>
+                                                ${classOptions}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">Group</label>
+                                            <select class="form-select" id="studentGroupId">
+                                                <option value="">Optional</option>
+                                                ${groupOptions}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn-add w-100"><i class="fas fa-save"></i> Save Student</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Teacher Modal -->
+                <div class="modal fade" id="teacherModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="teacherModalTitle">Add Teacher</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="teacherForm" onsubmit="saveTeacher(event)">
+                                    <input type="hidden" id="teacherDbId">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">First Name</label>
+                                            <input type="text" class="form-control" id="teacherFirstName" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Last Name</label>
+                                            <input type="text" class="form-control" id="teacherLastName" required>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="teacherEmail" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Username</label>
+                                        <input type="text" class="form-control" id="teacherUsername" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Password</label>
+                                        <input type="password" class="form-control" id="teacherPassword" required>
+                                        <small style="color: #6a6f73;">Leave blank when editing to keep current password</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Department</label>
+                                        <select class="form-select" id="teacherDeptId" required>
+                                            <option value="">Select Department</option>
+                                            ${deptOptions}
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Specialization</label>
+                                        <input type="text" class="form-control" id="teacherSpecialization">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Office Location</label>
+                                        <input type="text" class="form-control" id="teacherOffice">
+                                    </div>
+                                    
+                                    <div class="mb-3" id="teacherAssignmentsSection" style="display: none;">
+                                        <label class="form-label">Subject Assignments</label>
+                                        <div class="border p-3" style="background: #f7f9fc; border-radius: 8px;">
+                                            <div class="row mb-2">
+                                                <div class="col-md-3">
+                                                    <select class="form-select form-select-sm" id="assignSemester" onchange="loadClassGroups()">
+                                                        <option value="">Semester</option>
+                                                        <option value="1">Semester 1</option>
+                                                        <option value="2">Semester 2</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <select class="form-select form-select-sm" id="assignClass" onchange="loadClassGroups()">
+                                                        <option value="">Class</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <select class="form-select form-select-sm" id="assignGroup">
+                                                        <option value="">Group</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <select class="form-select form-select-sm" id="assignSubject">
+                                                        <option value="">Subject</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-primary" onclick="addTeacherAssignment()">
+                                                <i class="fas fa-plus"></i> Add Assignment
+                                            </button>
+                                            <div id="assignmentsList" class="mt-3"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn-add w-100"><i class="fas fa-save"></i> Save Teacher</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function showAddDepartmentModal() {
+            document.getElementById('departmentModalTitle').textContent = 'Add Department';
+            document.getElementById('departmentForm').reset();
+            document.getElementById('departmentId').value = '';
+            new bootstrap.Modal(document.getElementById('departmentModal')).show();
+        }
+        
+        function showAddClassModal() {
+            document.getElementById('classModalTitle').textContent = 'Add Class';
+            document.getElementById('classForm').reset();
+            document.getElementById('classId').value = '';
+            populateClassSubjects(null);
+            new bootstrap.Modal(document.getElementById('classModal')).show();
+        }
+        
+        function showAddSubjectModal() {
+            document.getElementById('subjectModalTitle').textContent = 'Add Subject';
+            document.getElementById('subjectForm').reset();
+            document.getElementById('subjectId').value = '';
+            new bootstrap.Modal(document.getElementById('subjectModal')).show();
+        }
+        
+        function showAddGroupModal() {
+            document.getElementById('groupModalTitle').textContent = 'Add Group';
+            document.getElementById('groupForm').reset();
+            document.getElementById('groupId').value = '';
+            new bootstrap.Modal(document.getElementById('groupModal')).show();
+        }
+        
+        function showAddStudentModal() {
+            document.getElementById('studentModalTitle').textContent = 'Add Student';
+            document.getElementById('studentForm').reset();
+            document.getElementById('studentDbId').value = '';
+            document.getElementById('studentPassword').required = true;
+            new bootstrap.Modal(document.getElementById('studentModal')).show();
+        }
+        
+        function filterStudentGroups() {
+            const classId = document.getElementById('studentClassId').value;
+            const groupSelect = document.getElementById('studentGroupId');
+            
+            if (!classId) {
+                groupSelect.innerHTML = '<option value="">Select a class first</option>';
+                return;
+            }
+            
+            const filteredGroups = currentData.groups.filter(g => 
+                g.studentClass && g.studentClass.id == classId
+            );
+            
+            groupSelect.innerHTML = '<option value="">Optional</option>' + 
+                filteredGroups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+        }
+        
+        function showAddTeacherModal() {
+            document.getElementById('teacherModalTitle').textContent = 'Add Teacher';
+            document.getElementById('teacherForm').reset();
+            document.getElementById('teacherDbId').value = '';
+            document.getElementById('teacherPassword').required = true;
+            new bootstrap.Modal(document.getElementById('teacherModal')).show();
+        }
+        
+        function editDepartment(id) {
+            const dept = currentData.departments.find(d => d.id === id);
+            if (!dept) return;
+            
+            document.getElementById('departmentModalTitle').textContent = 'Edit Department';
+            document.getElementById('departmentId').value = dept.id;
+            document.getElementById('deptCode').value = dept.code;
+            document.getElementById('deptName').value = dept.name;
+            document.getElementById('deptDescription').value = dept.description || '';
+            document.getElementById('deptHodId').value = dept.headOfDepartmentId || '';
+            
+            new bootstrap.Modal(document.getElementById('departmentModal')).show();
+        }
+        
+        function editClass(id) {
+            const cls = currentData.classes.find(c => c.id === id);
+            if (!cls) return;
+            
+            document.getElementById('classModalTitle').textContent = 'Edit Class';
+            document.getElementById('classId').value = cls.id;
+            document.getElementById('className').value = cls.name;
+            document.getElementById('classLevel').value = cls.level || '';
+            document.getElementById('classYear').value = cls.academicYear || '';
+            document.getElementById('classDeptId').value = cls.department ? cls.department.id : '';
+            
+            populateClassSubjects(cls.id);
+            new bootstrap.Modal(document.getElementById('classModal')).show();
+        }
+        
+        async function populateClassSubjects(classId) {
+            let existingSubjects = [];
+            if (classId) {
+                try {
+                    const response = await fetch(`/api/class-subjects/class/${classId}`, { credentials: 'include' });
+                    if (response.ok) {
+                        existingSubjects = await response.json();
+                    }
+                } catch (error) {
+                    console.error('Error loading class subjects:', error);
+                }
+            }
+            
+            const sem1Container = document.getElementById('semester1SubjectsList');
+            const sem2Container = document.getElementById('semester2SubjectsList');
+            
+            sem1Container.innerHTML = currentData.subjects.map(subject => {
+                const existing = existingSubjects.find(cs => cs.subject.id === subject.id && cs.semester === 1);
+                return `
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="s1_${subject.id}" 
+                            data-subject-id="${subject.id}" data-semester="1" 
+                            ${existing ? 'checked' : ''}>
+                        <label class="form-check-label d-flex align-items-center justify-content-between" for="s1_${subject.id}">
+                            <span>${subject.code} - ${subject.name}</span>
+                            <input type="number" step="0.5" min="0.5" class="form-control form-control-sm ms-2" 
+                                style="width: 80px;" placeholder="Coef" id="coef_s1_${subject.id}"
+                                value="${existing ? existing.coefficient : 1}" ${!existing ? 'disabled' : ''}>
+                        </label>
+                    </div>
+                `;
+            }).join('');
+            
+            sem2Container.innerHTML = currentData.subjects.map(subject => {
+                const existing = existingSubjects.find(cs => cs.subject.id === subject.id && cs.semester === 2);
+                return `
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="s2_${subject.id}" 
+                            data-subject-id="${subject.id}" data-semester="2" 
+                            ${existing ? 'checked' : ''}>
+                        <label class="form-check-label d-flex align-items-center justify-content-between" for="s2_${subject.id}">
+                            <span>${subject.code} - ${subject.name}</span>
+                            <input type="number" step="0.5" min="0.5" class="form-control form-control-sm ms-2" 
+                                style="width: 80px;" placeholder="Coef" id="coef_s2_${subject.id}"
+                                value="${existing ? existing.coefficient : 1}" ${!existing ? 'disabled' : ''}>
+                        </label>
+                    </div>
+                `;
+            }).join('');
+            
+            // Add event listeners to enable/disable coefficient inputs
+            document.querySelectorAll('#semester1SubjectsList .form-check-input, #semester2SubjectsList .form-check-input').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const subjectId = this.dataset.subjectId;
+                    const semester = this.dataset.semester;
+                    const coefInput = document.getElementById(`coef_s${semester}_${subjectId}`);
+                    coefInput.disabled = !this.checked;
+                });
+            });
+        }
+        
+        function editSubject(id) {
+            const subject = currentData.subjects.find(s => s.id === id);
+            if (!subject) return;
+            
+            document.getElementById('subjectModalTitle').textContent = 'Edit Subject';
+            document.getElementById('subjectId').value = subject.id;
+            document.getElementById('subjectName').value = subject.name;
+            document.getElementById('subjectCode').value = subject.code;
+            document.getElementById('subjectCreditHours').value = subject.creditHours || '';
+            document.getElementById('subjectDescription').value = subject.description || '';
+            
+            new bootstrap.Modal(document.getElementById('subjectModal')).show();
+        }
+        
+        function editGroup(id) {
+            const grp = currentData.groups.find(g => g.id === id);
+            if (!grp) return;
+            
+            document.getElementById('groupModalTitle').textContent = 'Edit Group';
+            document.getElementById('groupId').value = grp.id;
+            document.getElementById('groupName').value = grp.name;
+            document.getElementById('groupCapacity').value = grp.capacity || 30;
+            document.getElementById('groupClassId').value = grp.studentClass ? grp.studentClass.id : '';
+            
+            new bootstrap.Modal(document.getElementById('groupModal')).show();
+        }
+        
+        function editStudent(id) {
+            const student = currentData.students.find(s => s.id === id);
+            if (!student) return;
+            
+            document.getElementById('studentModalTitle').textContent = 'Edit Student';
+            document.getElementById('studentDbId').value = student.id;
+            document.getElementById('studentId').value = student.studentId;
+            document.getElementById('studentUsername').value = student.user.username;
+            document.getElementById('studentFirstName').value = student.user.firstName;
+            document.getElementById('studentLastName').value = student.user.lastName;
+            document.getElementById('studentEmail').value = student.user.email;
+            document.getElementById('studentPassword').value = '';
+            document.getElementById('studentPassword').required = false;
+            document.getElementById('studentDeptId').value = student.department ? student.department.id : '';
+            document.getElementById('studentClassId').value = student.studentClass ? student.studentClass.id : '';
+            filterStudentGroups(); // Filter groups based on selected class
+            document.getElementById('studentGroupId').value = student.group ? student.group.id : '';
+            
+            new bootstrap.Modal(document.getElementById('studentModal')).show();
+        }
+        
+        function editTeacher(id) {
+            const teacher = currentData.teachers.find(t => t.id === id);
+            if (!teacher) return;
+            
+            document.getElementById('teacherModalTitle').textContent = 'Edit Teacher';
+            document.getElementById('teacherDbId').value = teacher.id;
+            document.getElementById('teacherFirstName').value = teacher.firstName;
+            document.getElementById('teacherLastName').value = teacher.lastName;
+            document.getElementById('teacherEmail').value = teacher.email;
+            document.getElementById('teacherUsername').value = teacher.username;
+            document.getElementById('teacherPassword').value = '';
+            document.getElementById('teacherPassword').required = false;
+            document.getElementById('teacherDeptId').value = teacher.departmentId || '';
+            document.getElementById('teacherSpecialization').value = teacher.specialization || '';
+            document.getElementById('teacherOffice').value = teacher.officeLocation || '';
+            
+            // Show and populate assignments section
+            document.getElementById('teacherAssignmentsSection').style.display = 'block';
+            populateAssignmentSelects();
+            loadTeacherAssignments(teacher.id);
+            
+            new bootstrap.Modal(document.getElementById('teacherModal')).show();
+        }
+        
+        function populateAssignmentSelects() {
+            const classSelect = document.getElementById('assignClass');
+            classSelect.innerHTML = '<option value="">Class</option>' + 
+                currentData.classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        }
+        
+        async function loadClassGroups() {
+            const classId = document.getElementById('assignClass').value;
+            const semester = document.getElementById('assignSemester').value;
+            const groupSelect = document.getElementById('assignGroup');
+            const subjectSelect = document.getElementById('assignSubject');
+            
+            groupSelect.innerHTML = '<option value="">Group</option>';
+            subjectSelect.innerHTML = '<option value="">Subject</option>';
+            
+            if (!classId) return;
+            
+            // Populate groups
+            const groups = currentData.groups.filter(g => g.studentClass && g.studentClass.id == classId);
+            groupSelect.innerHTML = '<option value="">All Groups</option>' + 
+                groups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+            
+            // Populate subjects if semester is selected
+            if (semester) {
+                try {
+                    const response = await fetch(`/api/class-subjects/class/${classId}/semester/${semester}`, { credentials: 'include' });
+                    if (response.ok) {
+                        const classSubjects = await response.json();
+                        subjectSelect.innerHTML = '<option value="">Subject</option>' + 
+                            classSubjects.map(cs => `<option value="${cs.subject.id}">${cs.subject.code} - ${cs.subject.name}</option>`).join('');
+                    }
+                } catch (error) {
+                    console.error('Error loading subjects:', error);
+                }
+            }
+        }
+        
+        let teacherAssignments = [];
+        
+        // Helper function to get current academic year
+        function getCurrentAcademicYear() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1; // JavaScript months are 0-indexed
+            
+            // Academic year starts in September
+            if (month >= 9) {
+                return `${year}-${year + 1}`;
+            } else {
+                return `${year - 1}-${year}`;
+            }
+        }
+        
+        async function loadTeacherAssignments(teacherId) {
+            try {
+                const response = await fetch(`/api/teacher-assignments/teacher/${teacherId}`, { credentials: 'include' });
+                if (response.ok) {
+                    const assignments = await response.json();
+                    console.log('Loaded teacher assignments:', assignments);
+                    
+                    // Enrich with display names
+                    teacherAssignments = assignments.map(a => {
+                        const cls = currentData.classes.find(c => c.id == a.classId);
+                        const group = a.groupId ? currentData.groups.find(g => g.id == a.groupId) : null;
+                        const subject = currentData.subjects.find(s => s.id == a.subjectId);
+                        
+                        return {
+                            id: a.id,
+                            semester: a.semester,
+                            classId: a.classId,
+                            className: cls ? cls.name : 'Unknown Class',
+                            groupId: a.groupId,
+                            groupName: group ? group.name : 'All Groups',
+                            subjectId: a.subjectId,
+                            subjectName: subject ? subject.name : 'Unknown Subject',
+                            subjectCode: subject ? subject.code : 'N/A',
+                            academicYear: a.academicYear
+                        };
+                    });
+                    
+                    console.log('Enriched assignments:', teacherAssignments);
+                    renderAssignmentsList();
+                }
+            } catch (error) {
+                console.error('Error loading teacher assignments:', error);
+                teacherAssignments = [];
+            }
+        }
+        
+        function addTeacherAssignment() {
+            const semester = document.getElementById('assignSemester').value;
+            const classId = document.getElementById('assignClass').value;
+            const groupId = document.getElementById('assignGroup').value || null;
+            const subjectId = document.getElementById('assignSubject').value;
+            
+            if (!semester || !classId || !subjectId) {
+                alert('Please select semester, class, and subject');
+                return;
+            }
+            
+            const cls = currentData.classes.find(c => c.id == classId);
+            const group = groupId ? currentData.groups.find(g => g.id == groupId) : null;
+            const subject = currentData.subjects.find(s => s.id == subjectId);
+            
+            teacherAssignments.push({
+                semester: parseInt(semester),
+                classId: parseInt(classId),
+                className: cls.name,
+                groupId: groupId ? parseInt(groupId) : null,
+                groupName: group ? group.name : 'All Groups',
+                subjectId: parseInt(subjectId),
+                subjectName: subject.name,
+                subjectCode: subject.code,
+                isNew: true
+            });
+            
+            renderAssignmentsList();
+            
+            // Reset selects
+            document.getElementById('assignSemester').value = '';
+            document.getElementById('assignClass').value = '';
+            document.getElementById('assignGroup').innerHTML = '<option value="">Group</option>';
+            document.getElementById('assignSubject').innerHTML = '<option value="">Subject</option>';
+        }
+        
+        function renderAssignmentsList() {
+            const container = document.getElementById('assignmentsList');
+            if (teacherAssignments.length === 0) {
+                container.innerHTML = '<p class="text-muted"><small>No assignments yet</small></p>';
+                return;
+            }
+            
+            container.innerHTML = teacherAssignments.map((assignment, index) => `
+                <div class="alert alert-info d-flex justify-content-between align-items-center mb-2 py-2">
+                    <span><strong>S${assignment.semester}</strong> - ${assignment.className} / ${assignment.groupName || 'All'} / ${assignment.subjectCode}</span>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removeAssignment(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        function removeAssignment(index) {
+            teacherAssignments.splice(index, 1);
+            renderAssignmentsList();
+        }
+        
+        async function saveDepartment(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('departmentId').value;
+            const data = {
+                code: document.getElementById('deptCode').value,
+                name: document.getElementById('deptName').value,
+                description: document.getElementById('deptDescription').value,
+                headOfDepartmentId: document.getElementById('deptHodId').value || null
+            };
+            
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `/api/departments/${id}` : '/api/departments';
+            
+            try {
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('departmentModal')).hide();
+                    await loadAllData();
+                } else {
+                    alert('Failed to save department: ' + await response.text());
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        async function saveClass(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('classId').value;
+            const data = {
+                name: document.getElementById('className').value,
+                level: document.getElementById('classLevel').value,
+                academicYear: document.getElementById('classYear').value,
+                departmentId: document.getElementById('classDeptId').value
+            };
+            
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `/api/classes/${id}` : '/api/classes';
+            
+            try {
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    const savedClass = await response.json();
+                    console.log('Class saved, now saving subjects for class ID:', savedClass.id);
+                    
+                    // Save class-subject assignments
+                    await saveClassSubjects(savedClass.id);
+                    
+                    bootstrap.Modal.getInstance(document.getElementById('classModal')).hide();
+                    await loadAllData();
+                } else {
+                    alert('Failed to save class: ' + await response.text());
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        async function saveClassSubjects(classId) {
+            const subjectAssignments = [];
+            
+            // Get semester 1 assignments
+            document.querySelectorAll('#semester1SubjectsList .form-check-input:checked').forEach(checkbox => {
+                const subjectId = checkbox.dataset.subjectId;
+                const coefficient = parseFloat(document.getElementById(`coef_s1_${subjectId}`).value) || 1.0;
+                subjectAssignments.push({
+                    classId: classId,
+                    subjectId: parseInt(subjectId),
+                    semester: 1,
+                    coefficient: coefficient,
+                    isActive: true
+                });
+            });
+            
+            // Get semester 2 assignments
+            document.querySelectorAll('#semester2SubjectsList .form-check-input:checked').forEach(checkbox => {
+                const subjectId = checkbox.dataset.subjectId;
+                const coefficient = parseFloat(document.getElementById(`coef_s2_${subjectId}`).value) || 1.0;
+                subjectAssignments.push({
+                    classId: classId,
+                    subjectId: parseInt(subjectId),
+                    semester: 2,
+                    coefficient: coefficient,
+                    isActive: true
+                });
+            });
+            
+            console.log('Saving class subjects:', subjectAssignments);
+            
+            // Send assignments to backend
+            try {
+                const response = await fetch(`/api/class-subjects/class/${classId}/bulk`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(subjectAssignments)
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Failed to save class-subject assignments:', errorText);
+                    alert('Failed to save subject assignments: ' + errorText);
+                } else {
+                    console.log('Class subjects saved successfully');
+                }
+            } catch (error) {
+                console.error('Error saving class subjects:', error);
+                alert('Error saving subjects: ' + error.message);
+            }
+        }
+        
+        async function saveSubject(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('subjectId').value;
+            const creditHoursValue = document.getElementById('subjectCreditHours').value;
+            const data = {
+                name: document.getElementById('subjectName').value,
+                code: document.getElementById('subjectCode').value,
+                coefficient: 1.0, // Default coefficient, will be set per class-subject assignment
+                creditHours: creditHoursValue ? parseInt(creditHoursValue) : null,
+                description: document.getElementById('subjectDescription').value
+            };
+            
+            console.log('Saving subject:', data);
+            
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `/api/subjects/${id}` : '/api/subjects';
+            
+            try {
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    console.log('Subject saved successfully');
+                    bootstrap.Modal.getInstance(document.getElementById('subjectModal')).hide();
+                    await loadAllData();
+                } else {
+                    const errorText = await response.text();
+                    console.error('Failed to save subject:', errorText);
+                    alert('Failed to save subject: ' + errorText);
+                }
+            } catch (error) {
+                console.error('Error saving subject:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        async function saveGroup(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('groupId').value;
+            const data = {
+                name: document.getElementById('groupName').value,
+                capacity: document.getElementById('groupCapacity').value,
+                classId: document.getElementById('groupClassId').value
+            };
+            
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `/api/groups/${id}` : '/api/groups';
+            
+            try {
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('groupModal')).hide();
+                    await loadAllData();
+                } else {
+                    alert('Failed to save group: ' + await response.text());
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        async function saveStudent(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('studentDbId').value;
+            const data = {
+                studentId: document.getElementById('studentId').value,
+                username: document.getElementById('studentUsername').value,
+                firstName: document.getElementById('studentFirstName').value,
+                lastName: document.getElementById('studentLastName').value,
+                email: document.getElementById('studentEmail').value,
+                departmentId: document.getElementById('studentDeptId').value,
+                classId: document.getElementById('studentClassId').value,
+                groupId: document.getElementById('studentGroupId').value || null
+            };
+            
+            const password = document.getElementById('studentPassword').value;
+            if (password) data.password = password;
+            
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `/api/students/${id}` : '/api/students';
+            
+            try {
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('studentModal')).hide();
+                    await loadAllData();
+                } else {
+                    alert('Failed to save student: ' + await response.text());
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        async function saveTeacher(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('teacherDbId').value;
+            const data = {
+                firstName: document.getElementById('teacherFirstName').value,
+                lastName: document.getElementById('teacherLastName').value,
+                email: document.getElementById('teacherEmail').value,
+                username: document.getElementById('teacherUsername').value,
+                departmentId: document.getElementById('teacherDeptId').value,
+                specialization: document.getElementById('teacherSpecialization').value,
+                officeLocation: document.getElementById('teacherOffice').value
+            };
+            
+            const password = document.getElementById('teacherPassword').value;
+            if (password) data.password = password;
+            
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `/api/teachers/${id}` : '/api/teachers';
+            
+            try {
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    const savedTeacher = await response.json();
+                    const teacherId = savedTeacher.id || id;
+                    
+                    console.log('Teacher saved, ID:', teacherId, 'Assignments to save:', teacherAssignments.length);
+                    
+                    // Save assignments if editing
+                    if (teacherId && teacherAssignments.length > 0) {
+                        await saveTeacherAssignments(teacherId);
+                    }
+                    
+                    bootstrap.Modal.getInstance(document.getElementById('teacherModal')).hide();
+                    await loadAllData();
+                } else {
+                    alert('Failed to save teacher: ' + await response.text());
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        async function saveTeacherAssignments(teacherId) {
+            console.log('Saving teacher assignments for teacher ID:', teacherId);
+            console.log('Assignments:', teacherAssignments);
+            
+            try {
+                // Delete existing assignments
+                const deleteResponse = await fetch(`/api/teacher-assignments/teacher/${teacherId}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                console.log('Delete existing assignments response:', deleteResponse.ok);
+                
+                // Create new ones
+                for (const assignment of teacherAssignments) {
+                    const payload = {
+                        teacherId: teacherId,
+                        classId: assignment.classId,
+                        subjectId: assignment.subjectId,
+                        groupId: assignment.groupId,
+                        semester: assignment.semester,
+                        academicYear: getCurrentAcademicYear()
+                    };
+                    
+                    console.log('Creating assignment:', payload);
+                    
+                    const createResponse = await fetch('/api/teacher-assignments', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!createResponse.ok) {
+                        const errorText = await createResponse.text();
+                        console.error('Failed to create assignment:', errorText);
+                        alert('Failed to save assignment: ' + errorText);
+                    } else {
+                        console.log('Assignment created successfully');
+                    }
+                }
+            } catch (error) {
+                console.error('Error saving teacher assignments:', error);
+                alert('Error saving assignments: ' + error.message);
+            }
+        }
+
+        // ========== EXCEL IMPORT/EXPORT FUNCTIONS ==========
+
+        function downloadStudentTemplate() {
+            window.location.href = '/api/excel/students/template';
+        }
+
+        function downloadTeacherTemplate() {
+            window.location.href = '/api/excel/teachers/template';
+        }
+
+        async function handleStudentExcelUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/excel/students/validate', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                showImportPreview(result, 'student');
+            } catch (error) {
+                alert('Error validating file: ' + error.message);
+            }
+
+            // Reset file input
+            event.target.value = '';
+        }
+
+        async function handleTeacherExcelUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/excel/teachers/validate', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                showImportPreview(result, 'teacher');
+            } catch (error) {
+                alert('Error validating file: ' + error.message);
+            }
+
+            // Reset file input
+            event.target.value = '';
+        }
+
+        function showImportPreview(result, type) {
+            console.log('Import result:', result);
+            console.log('Valid data:', result.validData);
+            
+            pendingImportResult = result;
+            importType = type;
+
+            const modal = new bootstrap.Modal(document.getElementById('importPreviewModal'));
+            document.getElementById('importPreviewTitle').textContent = 
+                type === 'student' ? 'Student Import Preview' : 'Teacher Import Preview';
+
+            // Show summary
+            const summary = document.getElementById('importSummary');
+            summary.innerHTML = `
+                <div class="alert alert-${result.success ? 'success' : 'warning'}">
+                    <h6><i class="fas fa-info-circle"></i> Import Summary</h6>
+                    <p class="mb-1"><strong>Total Rows:</strong> ${result.totalRows}</p>
+                    <p class="mb-1"><strong>Valid Rows:</strong> <span class="text-success">${result.validRows}</span></p>
+                    <p class="mb-0"><strong>Invalid Rows:</strong> <span class="text-danger">${result.invalidRows}</span></p>
+                </div>
+            `;
+
+            // Show errors
+            const errorsDiv = document.getElementById('importErrors');
+            if (result.errors && result.errors.length > 0) {
+                errorsDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6><i class="fas fa-exclamation-triangle"></i> Validation Errors</h6>
+                        <ul class="mb-0" style="max-height: 200px; overflow-y: auto;">
+                            ${result.errors.map(error => `<li>${error}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            } else {
+                errorsDiv.innerHTML = '';
+            }
+
+            // Show preview table (first 10 valid rows)
+            const previewDiv = document.getElementById('importPreviewTable');
+            if (result.validRows > 0) {
+                const previewData = result.validData.slice(0, 10);
+                previewDiv.innerHTML = `
+                    <h6>Preview (showing first ${Math.min(10, result.validRows)} of ${result.validRows} valid rows)</h6>
+                    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    ${type === 'student' ? `
+                                        <th>Student ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Department</th>
+                                        <th>Class</th>
+                                        <th>Status</th>
+                                    ` : `
+                                        <th>Teacher ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Department</th>
+                                        <th>Specialization</th>
+                                    `}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${previewData.map(row => `
+                                    <tr>
+                                        ${type === 'student' ? `
+                                            <td>${row.studentId || ''}</td>
+                                            <td>${(row.firstName || '') + ' ' + (row.lastName || '')}</td>
+                                            <td>${row.email || ''}</td>
+                                            <td>${row.departmentCode || (row.department ? row.department.code : '')}</td>
+                                            <td>${row.className || (row.studentClass ? row.studentClass.name : '')}</td>
+                                            <td>${row.status || ''}</td>
+                                        ` : `
+                                            <td>${row.teacherId || ''}</td>
+                                            <td>${(row.firstName || '') + ' ' + (row.lastName || '')}</td>
+                                            <td>${row.email || ''}</td>
+                                            <td>${row.departmentCode || (row.department ? row.department.code : '')}</td>
+                                            <td>${row.specialization || '-'}</td>
+                                        `}
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } else {
+                previewDiv.innerHTML = '<p class="text-muted">No valid data to preview</p>';
+            }
+
+            // Enable/disable import button
+            document.getElementById('confirmImportBtn').disabled = !result.success || result.validRows === 0;
+
+            modal.show();
+        }
+
+        async function confirmImport() {
+            if (!pendingImportResult || !importType) return;
+
+            const btn = document.getElementById('confirmImportBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing...';
+
+            try {
+                const endpoint = importType === 'student' ? 
+                    '/api/excel/students/import' : '/api/excel/teachers/import';
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(pendingImportResult)
+                });
+
+                const message = await response.text();
+
+                if (response.ok) {
+                    alert(message);
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('importPreviewModal')).hide();
+                    // Reload data
+                    loadAllData();
+                } else {
+                    alert('Import failed: ' + message);
+                }
+            } catch (error) {
+                alert('Error importing data: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check"></i> Import Data';
+                pendingImportResult = null;
+                importType = null;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Post - Faculty LMS</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Quill Rich Text Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f7f9fa;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: white !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            padding: 16px 0;
+            border-bottom: 1px solid #d1d7dc;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: #1c1d1f !important;
+            font-size: 20px;
+        }
+        
+        .navbar-brand i {
+            margin-right: 10px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .main-container {
+            padding: 32px 0;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #d1d7dc;
+        }
+        
+        .form-card h1 {
+            color: #1c1d1f;
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .form-label {
+            font-weight: 700;
+            color: #1c1d1f;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #d1d7dc;
+            padding: 12px 15px;
+            transition: all 0.2s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #a435f0;
+            box-shadow: 0 0 0 4px rgba(164, 53, 240, 0.1);
+        }
+        
+        textarea.form-control {
+            min-height: 200px;
+            resize: vertical;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(164, 53, 240, 0.25);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #8710d8 0%, #6b0ab0 100%);
+            box-shadow: 0 6px 20px rgba(164, 53, 240, 0.35);
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .btn-back {
+            background: linear-gradient(135deg, #6a6f73 0%, #2d2f31 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        
+        .btn-back:hover {
+            background: linear-gradient(135deg, #2d2f31 0%, #1c1d1f 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(28, 29, 31, 0.3);
+            color: white;
+        }
+        
+        .btn-logout {
+            background: linear-gradient(135deg, #2d2f31 0%, #1c1d1f 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+        
+        .btn-logout:hover {
+            background: linear-gradient(135deg, #1c1d1f 0%, #000000 100%);
+            box-shadow: 0 4px 12px rgba(28, 29, 31, 0.3);
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, #f7f9fa 0%, #ffffff 100%);
+            border-left: 4px solid #a435f0;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid #d1d7dc;
+        }
+        
+        .info-box i {
+            color: #a435f0;
+            margin-right: 10px;
+        }
+        
+        .info-box p {
+            margin: 0;
+            color: #6a6f73;
+        }
+        
+        .file-upload-area {
+            margin-bottom: 16px;
+        }
+        
+        .btn-upload-file {
+            background: linear-gradient(135deg, #f7f9fa 0%, #ffffff 100%);
+            border: 2px dashed #d1d7dc;
+            color: #1c1d1f;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .btn-upload-file:hover {
+            border-color: #a435f0;
+            background: linear-gradient(135deg, #f7f4fd 0%, #f0ebf8 100%);
+            color: #a435f0;
+        }
+        
+        .btn-upload-file i {
+            font-size: 20px;
+        }
+        
+        .uploaded-files-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .file-item {
+            background: white;
+            border: 1px solid #d1d7dc;
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .file-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .file-icon.pdf {
+            background: linear-gradient(135deg, #ff4757 0%, #e74c3c 100%);
+            color: white;
+        }
+        
+        .file-icon.doc {
+            background: linear-gradient(135deg, #2e86de 0%, #0652DD 100%);
+            color: white;
+        }
+        
+        .file-icon.xls {
+            background: linear-gradient(135deg, #1dd1a1 0%, #10ac84 100%);
+            color: white;
+        }
+        
+        .file-icon.ppt {
+            background: linear-gradient(135deg, #ff6348 0%, #ee5a6f 100%);
+            color: white;
+        }
+        
+        .file-icon.default {
+            background: linear-gradient(135deg, #a4b0be 0%, #747d8c 100%);
+            color: white;
+        }
+        
+        .file-info {
+            flex: 1;
+        }
+        
+        .file-name {
+            font-weight: 600;
+            color: #1c1d1f;
+            margin-bottom: 4px;
+        }
+        
+        .file-size {
+            font-size: 13px;
+            color: #6a6f73;
+        }
+        
+        .file-remove {
+            background: none;
+            border: none;
+            color: #ff4757;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .file-remove:hover {
+            background: rgba(255, 71, 87, 0.1);
+        }
+        
+        .visibility-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .visibility-option {
+            position: relative;
+        }
+        
+        .visibility-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .visibility-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border: 2px solid #d1d7dc;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+            text-align: center;
+        }
+        
+        .visibility-label:hover {
+            border-color: #a435f0;
+            background: linear-gradient(135deg, #f7f4fd 0%, #f0ebf8 100%);
+        }
+        
+        .visibility-option input[type="radio"]:checked + .visibility-label {
+            border-color: #a435f0;
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(164, 53, 240, 0.25);
+        }
+        
+        .visibility-label i {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #a435f0;
+        }
+        
+        .visibility-option input[type="radio"]:checked + .visibility-label i {
+            color: white;
+        }
+        
+        .visibility-label strong {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .visibility-label small {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .target-selection {
+            background: linear-gradient(135deg, #f7f9fa 0%, #ffffff 100%);
+            border: 1px solid #d1d7dc;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 16px;
+        }
+        
+        .target-selection h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1c1d1f;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .target-selection h4 i {
+            color: #a435f0;
+        }
+        
+        .groups-checkbox-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .group-checkbox-item {
+            position: relative;
+        }
+        
+        .group-checkbox {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .group-checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border: 2px solid #d1d7dc;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+            font-weight: 600;
+            color: #2d2f31;
+        }
+        
+        .group-checkbox-label:hover {
+            border-color: #a435f0;
+            background: linear-gradient(135deg, #f7f4fd 0%, #f0ebf8 100%);
+        }
+        
+        .group-checkbox:checked + .group-checkbox-label {
+            border-color: #a435f0;
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(164, 53, 240, 0.25);
+        }
+        
+        .group-checkbox-label i {
+            color: #a435f0;
+            font-size: 16px;
+        }
+        
+        .group-checkbox:checked + .group-checkbox-label i {
+            color: white;
+        }
+        
+        .layout-wrapper {
+            display: flex;
+            gap: 24px;
+        }
+        
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-nav {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #d1d7dc;
+            position: sticky;
+            top: 24px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 8px;
+            color: #2d2f31;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .nav-item:hover {
+            background: linear-gradient(135deg, #f7f4fd 0%, #f0ebf8 100%);
+            color: #8710d8;
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(164, 53, 240, 0.25);
+        }
+        
+        .nav-item i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .nav-badge {
+            margin-left: auto;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 12px;
+            padding: 2px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            min-width: 24px;
+            text-align: center;
+        }
+        
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-chalkboard-teacher"></i>
+                Faculty LMS
+            </a>
+            <div class="user-info">
+                <div class="user-avatar" th:text="${user.firstName.substring(0,1) + user.lastName.substring(0,1)}">
+                </div>
+                <div>
+                    <div style="font-weight: 600; color: #1c1d1f; font-size: 14px;" th:text="${user.firstName + ' ' + user.lastName}">Teacher Name</div>
+                    <div style="font-size: 12px; color: #6a6f73;" th:text="${user.role.name() == 'HEAD_OF_DEPARTMENT' ? 'Head of Department' : 'Teacher'}">Teacher</div>
+                </div>
+                <form th:action="@{/logout}" method="post" style="margin: 0;">
+                    <button type="submit" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+            <div class="layout-wrapper">
+                <!-- Sidebar -->
+                <aside class="sidebar">
+                    <div class="sidebar-nav">
+                        <a href="/teacher/dashboard" class="nav-item">
+                            <i class="fas fa-stream"></i>
+                            <span th:if="${user != null && user.role.name() == 'HEAD_OF_DEPARTMENT'}">Department Feed</span>
+                            <span th:if="${user == null || user.role.name() != 'HEAD_OF_DEPARTMENT'}">My Feed</span>
+                        </a>
+                        <a href="/teacher/posts/new" class="nav-item active">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Create Post</span>
+                        </a>
+                        <div th:if="${user != null && user.role.name() == 'HEAD_OF_DEPARTMENT'}">
+                            <a href="/teacher/pending-approvals" class="nav-item">
+                                <i class="fas fa-tasks"></i>
+                                <span>Pending Approvals</span>
+                                <span th:if="${pendingCount != null && pendingCount > 0}" 
+                                      class="nav-badge" 
+                                      th:text="${pendingCount}">0</span>
+                            </a>
+                        </div>
+                    </div>
+                </aside>
+                
+                <!-- Main Content -->
+                <div class="main-content">
+                    <div class="form-card">
+                <h1>
+                    <i class="fas fa-pen"></i>
+                    Create New Post
+                </h1>
+                <p style="color: #666; margin-bottom: 30px;">Share announcements and materials with your students</p>
+                
+                <div class="info-box">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Note:</strong> Posts will be saved as drafts first. You can submit them for approval by the Head of Department later.
+                </div>
+                
+                <form id="postForm" method="post" action="/api/posts" onsubmit="createPost(event)">
+                    <!-- Title -->
+                    <div class="mb-4">
+                        <label class="form-label" for="title">
+                            <i class="fas fa-heading"></i> Post Title *
+                        </label>
+                        <input type="text" class="form-control" id="title" name="title" required 
+                               placeholder="Enter a clear and descriptive title">
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="mb-4">
+                        <label class="form-label" for="content">
+                            <i class="fas fa-align-left"></i> Content *
+                        </label>
+                        <div id="editor" style="height: 300px; background: white;"></div>
+                        <textarea class="form-control" id="content" name="content" style="display: none;"></textarea>
+                    </div>
+                    
+                    <!-- File Attachments -->
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-paperclip"></i> File Attachments
+                        </label>
+                        <p style="color: #6a6f73; font-size: 14px; margin-bottom: 12px;">
+                            Upload files (PDF, Excel, Word, etc.) - Max 10MB per file
+                        </p>
+                        
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <input type="file" id="fileInput" multiple style="display: none;" 
+                                   accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar" 
+                                   onchange="handleFileSelection(event)">
+                            <button type="button" class="btn-upload-file" onclick="document.getElementById('fileInput').click()">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                Choose Files
+                            </button>
+                        </div>
+                        
+                        <!-- Uploaded Files List -->
+                        <div id="uploadedFilesList" class="uploaded-files-list"></div>
+                    </div>
+                    
+                    <!-- Visibility -->
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-eye"></i> Who can see this post? *
+                        </label>
+                        <div class="visibility-options">
+                            <div class="visibility-option">
+                                <input type="radio" id="vis-group" name="visibility" value="GROUP" required onchange="updateTargetFields()" checked>
+                                <label for="vis-group" class="visibility-label">
+                                    <i class="fas fa-users"></i>
+                                    <strong>My Groups</strong>
+                                    <small>Select specific groups</small>
+                                </label>
+                            </div>
+                            <div class="visibility-option">
+                                <input type="radio" id="vis-class" name="visibility" value="CLASS" required onchange="updateTargetFields()">
+                                <label for="vis-class" class="visibility-label">
+                                    <i class="fas fa-school"></i>
+                                    <strong>Entire Class</strong>
+                                    <small>All students in a class</small>
+                                </label>
+                            </div>
+                            <div class="visibility-option">
+                                <input type="radio" id="vis-dept" name="visibility" value="DEPARTMENT" required onchange="updateTargetFields()">
+                                <label for="vis-dept" class="visibility-label">
+                                    <i class="fas fa-building"></i>
+                                    <strong>Whole Department</strong>
+                                    <small>All department students</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Target Selection (shown based on visibility) -->
+                    <div id="targetSelection">
+                        <div class="target-selection">
+                            <!-- Groups Selection (checkboxes) -->
+                            <div id="groupsField">
+                                <h4><i class="fas fa-users"></i> Select Groups</h4>
+                                <p style="color: #6a6f73; font-size: 14px; margin-bottom: 12px;">Choose which groups will receive this post</p>
+                                <div class="groups-checkbox-list">
+                                    <div th:each="grp : ${groups}" class="group-checkbox-item">
+                                        <input type="checkbox" 
+                                               th:id="'group-' + ${grp.id}" 
+                                               name="targetGroupIds" 
+                                               th:value="${grp.id}"
+                                               class="group-checkbox">
+                                        <label th:for="'group-' + ${grp.id}" class="group-checkbox-label">
+                                            <i class="fas fa-users"></i>
+                                            <span th:text="${grp.name + ' (' + grp.studentClass.name + ')'}">Group Name</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Class Selection -->
+                            <div id="classField" style="display: none;">
+                                <h4><i class="fas fa-school"></i> Select Class</h4>
+                                <select class="form-select" id="targetClassId" name="targetClassId">
+                                    <option value="">Choose class...</option>
+                                    <option th:each="cls : ${classes}" 
+                                            th:if="${cls.department.id == teacher.department.id}"
+                                            th:value="${cls.id}" 
+                                            th:text="${cls.name}"></option>
+                                </select>
+                            </div>
+                            
+                            <!-- Department (auto-filled, hidden) -->
+                            <input type="hidden" id="targetDepartmentId" name="targetDepartmentId" th:value="${teacher.department.id}">
+                        </div>
+                    </div>
+                    
+                    <!-- Buttons -->
+                    <div class="d-flex gap-3 mt-5">
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-save"></i>
+                            Save as Draft
+                        </button>
+                        <a th:href="@{/teacher/dashboard}" class="btn-back">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+    
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function updateTargetFields() {
+            const visibility = document.querySelector('input[name="visibility"]:checked')?.value;
+            const targetSelection = document.getElementById('targetSelection');
+            const groupsField = document.getElementById('groupsField');
+            const classField = document.getElementById('classField');
+            
+            // Reset all fields
+            groupsField.style.display = 'none';
+            classField.style.display = 'none';
+            
+            // Clear required on class
+            document.getElementById('targetClassId').required = false;
+            
+            // Clear all group checkboxes
+            document.querySelectorAll('.group-checkbox').forEach(cb => cb.checked = false);
+            
+            // Show relevant fields based on visibility
+            targetSelection.style.display = 'block';
+            
+            if (visibility === 'GROUP') {
+                groupsField.style.display = 'block';
+            } else if (visibility === 'CLASS') {
+                classField.style.display = 'block';
+                document.getElementById('targetClassId').required = true;
+            } else if (visibility === 'DEPARTMENT') {
+                // Department is auto-filled, no fields to show
+                targetSelection.style.display = 'none';
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTargetFields();
+            
+            // Initialize Quill Rich Text Editor
+            var quill = new Quill('#editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: {
+                        container: [
+                            [{ 'header': [1, 2, 3, false] }],
+                            ['bold', 'italic', 'underline', 'strike'],
+                            [{ 'color': [] }, { 'background': [] }],
+                            [{ 'align': [] }],
+                            [{ 'direction': 'rtl' }],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            ['link', 'image'],
+                            ['clean']
+                        ],
+                        handlers: {
+                            image: imageHandler
+                        }
+                    }
+                },
+                placeholder: 'Write your announcement or message here...'
+            });
+            
+            // Store quill instance globally
+            window.quillEditor = quill;
+            
+            // Handle pasted images
+            quill.root.addEventListener('paste', async function(e) {
+                const clipboardData = e.clipboardData || window.clipboardData;
+                const items = clipboardData.items;
+                
+                for (let i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf('image') !== -1) {
+                        e.preventDefault();
+                        
+                        const file = items[i].getAsFile();
+                        
+                        // Validate file size (max 5MB)
+                        if (file.size > 5 * 1024 * 1024) {
+                            alert('Image size should not exceed 5MB');
+                            return;
+                        }
+
+                        // Show loading state
+                        const range = quill.getSelection() || { index: quill.getLength() };
+                        quill.insertText(range.index, 'Uploading pasted image...');
+
+                        try {
+                            // Upload image to server
+                            const formData = new FormData();
+                            formData.append('image', file);
+
+                            const response = await fetch('/api/posts/upload-image', {
+                                method: 'POST',
+                                credentials: 'include',
+                                body: formData
+                            });
+
+                            if (response.ok) {
+                                const data = await response.json();
+                                const imageUrl = data.url;
+
+                                // Remove loading text
+                                quill.deleteText(range.index, 'Uploading pasted image...'.length);
+                                
+                                // Insert image
+                                quill.insertEmbed(range.index, 'image', imageUrl);
+                                
+                                // Move cursor after image
+                                quill.setSelection(range.index + 1);
+                            } else {
+                                const errorText = await response.text();
+                                alert('Failed to upload pasted image: ' + errorText);
+                                // Remove loading text
+                                quill.deleteText(range.index, 'Uploading pasted image...'.length);
+                            }
+                        } catch (error) {
+                            alert('Error uploading pasted image: ' + error.message);
+                            // Remove loading text
+                            quill.deleteText(range.index, 'Uploading pasted image...'.length);
+                        }
+                        
+                        break;
+                    }
+                }
+            });
+        });
+        
+        // Custom image handler for Quill
+        function imageHandler() {
+            const input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+            input.click();
+
+            input.onchange = async function() {
+                const file = input.files[0];
+                
+                // Validate file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Image size should not exceed 5MB');
+                    return;
+                }
+                
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select an image file');
+                    return;
+                }
+
+                // Show loading state
+                const range = window.quillEditor.getSelection();
+                window.quillEditor.insertText(range.index, 'Uploading image...');
+
+                try {
+                    // Upload image to server
+                    const formData = new FormData();
+                    formData.append('image', file);
+
+                    const response = await fetch('/api/posts/upload-image', {
+                        method: 'POST',
+                        credentials: 'include',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const imageUrl = data.url;
+
+                        // Remove loading text
+                        window.quillEditor.deleteText(range.index, 'Uploading image...'.length);
+                        
+                        // Insert image
+                        window.quillEditor.insertEmbed(range.index, 'image', imageUrl);
+                        
+                        // Move cursor after image
+                        window.quillEditor.setSelection(range.index + 1);
+                    } else {
+                        const errorText = await response.text();
+                        alert('Failed to upload image: ' + errorText);
+                        // Remove loading text
+                        window.quillEditor.deleteText(range.index, 'Uploading image...'.length);
+                    }
+                } catch (error) {
+                    alert('Error uploading image: ' + error.message);
+                    // Remove loading text
+                    const range = window.quillEditor.getSelection();
+                    if (range) {
+                        window.quillEditor.deleteText(range.index - 'Uploading image...'.length, 'Uploading image...'.length);
+                    }
+                }
+            };
+        }
+        
+        // File attachment handling
+        let uploadedFiles = [];
+        
+        function handleFileSelection(event) {
+            const files = Array.from(event.target.files);
+            
+            files.forEach(file => {
+                // Validate file size (max 10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert(`File "${file.name}" is too large. Maximum size is 10MB.`);
+                    return;
+                }
+                
+                // Add to uploaded files list
+                uploadedFiles.push(file);
+                displayFile(file);
+            });
+            
+            // Reset input so same file can be selected again
+            event.target.value = '';
+        }
+        
+        function displayFile(file) {
+            const filesList = document.getElementById('uploadedFilesList');
+            
+            // Determine file icon
+            const extension = file.name.split('.').pop().toLowerCase();
+            let iconClass = 'default';
+            let icon = 'fa-file';
+            
+            if (extension === 'pdf') {
+                iconClass = 'pdf';
+                icon = 'fa-file-pdf';
+            } else if (['doc', 'docx'].includes(extension)) {
+                iconClass = 'doc';
+                icon = 'fa-file-word';
+            } else if (['xls', 'xlsx'].includes(extension)) {
+                iconClass = 'xls';
+                icon = 'fa-file-excel';
+            } else if (['ppt', 'pptx'].includes(extension)) {
+                iconClass = 'ppt';
+                icon = 'fa-file-powerpoint';
+            }
+            
+            // Format file size
+            const size = formatFileSize(file.size);
+            
+            // Create file item
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.dataset.fileName = file.name;
+            fileItem.innerHTML = `
+                <div class="file-icon ${iconClass}">
+                    <i class="fas ${icon}"></i>
+                </div>
+                <div class="file-info">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-size">${size}</div>
+                </div>
+                <button type="button" class="file-remove" onclick="removeFile('${file.name}')">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            filesList.appendChild(fileItem);
+        }
+        
+        function removeFile(fileName) {
+            uploadedFiles = uploadedFiles.filter(f => f.name !== fileName);
+            
+            const fileItem = document.querySelector(`.file-item[data-file-name="${fileName}"]`);
+            if (fileItem) {
+                fileItem.remove();
+            }
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+        
+        async function createPost(event) {
+            event.preventDefault();
+            
+            // Get content from Quill editor
+            const content = window.quillEditor.root.innerHTML;
+            const textContent = window.quillEditor.getText().trim();
+            
+            // Validate content is not empty
+            if (!textContent || textContent.length === 0) {
+                alert('Please enter some content for your post');
+                return;
+            }
+            
+            document.getElementById('content').value = content;
+            
+            const formData = new FormData(event.target);
+            const visibility = formData.get('visibility');
+            
+            const data = {
+                title: formData.get('title'),
+                content: content,
+                visibility: visibility,
+                targetDepartmentId: formData.get('targetDepartmentId') || null
+            };
+            
+            // Handle different visibility types
+            if (visibility === 'CLASS') {
+                data.targetClassId = formData.get('targetClassId') || null;
+            } else if (visibility === 'GROUP') {
+                // Get all checked group IDs
+                const checkedGroups = Array.from(document.querySelectorAll('.group-checkbox:checked'))
+                    .map(cb => cb.value);
+                
+                if (checkedGroups.length === 0) {
+                    alert('Please select at least one group');
+                    return;
+                }
+                
+                // For now, we'll send to the first selected group
+                // TODO: Backend should support multiple groups
+                data.targetGroupId = checkedGroups[0];
+            }
+            
+            // Remove null values
+            Object.keys(data).forEach(key => {
+                if (data[key] === null || data[key] === '') {
+                    delete data[key];
+                }
+            });
+            
+            fetch('/api/posts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify(data)
+            })
+            .then(async response => {
+                if (response.ok) {
+                    const post = await response.json();
+                    
+                    // Upload attachments if any
+                    if (uploadedFiles.length > 0) {
+                        await uploadAttachments(post.id);
+                    }
+                    
+                    alert('Post created successfully as draft!');
+                    window.location.href = '/teacher/dashboard';
+                } else {
+                    return response.text().then(text => {
+                        alert('Failed to create post: ' + text);
+                    });
+                }
+            })
+            .catch(error => {
+                alert('Error creating post: ' + error.message);
+            });
+        }
+        
+        async function uploadAttachments(postId) {
+            for (const file of uploadedFiles) {
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                try {
+                    const response = await fetch(`/api/posts/${postId}/attachments`, {
+                        method: 'POST',
+                        credentials: 'include',
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        console.error(`Failed to upload ${file.name}`);
+                    }
+                } catch (error) {
+                    console.error(`Error uploading ${file.name}:`, error);
+                }
+            }
+        }
+    </script>
+    
+    <!-- Quill Rich Text Editor JS -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+</body>
+</html>

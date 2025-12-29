@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - Faculty LMS</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: white !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            padding: 16px 0;
+            border-bottom: 1px solid #d1d7dc;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: #1c1d1f !important;
+            font-size: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .main-container {
+            padding: 32px 0;
+        }
+        
+        .page-header {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #d1d7dc;
+        }
+        
+        .page-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1c1d1f;
+            margin-bottom: 8px;
+        }
+        
+        .page-header p {
+            color: #6a6f73;
+            font-size: 16px;
+            margin: 0;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+        
+        .info-card {
+            background: linear-gradient(135deg, #f7f9fa 0%, #ffffff 100%);
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #d1d7dc;
+        }
+        
+        .info-card strong {
+            display: block;
+            color: #6a6f73;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .info-card p {
+            color: #1c1d1f;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .btn-create {
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            margin-top: 24px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(164, 53, 240, 0.25);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-create:hover {
+            background: linear-gradient(135deg, #8710d8 0%, #6b0ab0 100%);
+            box-shadow: 0 6px 20px rgba(164, 53, 240, 0.35);
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #d1d7dc;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1c1d1f;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #f7f9fa;
+        }
+        
+        .post-card {
+            background: white;
+            border: 1px solid #d1d7dc;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: all 0.2s ease;
+        }
+        
+        .post-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        
+        .post-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1c1d1f;
+            margin: 0 0 12px 0;
+        }
+        
+        .post-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 14px;
+            color: #6a6f73;
+        }
+        
+        .post-meta i {
+            margin-right: 6px;
+            color: #a435f0;
+        }
+        
+        .post-content {
+            color: #2d2f31;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        
+        .badge-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        
+        .status-draft {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            color: #1565c0;
+        }
+        
+        .status-pending {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            color: #e65100;
+        }
+        
+        .status-approved {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            color: #2e7d32;
+        }
+        
+        .status-rejected {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            color: #c62828;
+        }
+        
+        .post-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #f7f9fa;
+        }
+        
+        .btn-action {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(164, 53, 240, 0.25);
+        }
+        
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #8710d8 0%, #6b0ab0 100%);
+            box-shadow: 0 4px 12px rgba(164, 53, 240, 0.35);
+            transform: translateY(-2px);
+        }
+        
+        .btn-approve {
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.25);
+        }
+        
+        .btn-approve:hover {
+            background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.35);
+            transform: translateY(-2px);
+        }
+        
+        .btn-reject {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(244, 67, 54, 0.25);
+        }
+        
+        .btn-reject:hover {
+            background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.35);
+            transform: translateY(-2px);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 64px 24px;
+        }
+        
+        .empty-state i {
+            font-size: 64px;
+            color: #d1d7dc;
+            margin-bottom: 16px;
+        }
+        
+        .empty-state h3 {
+            color: #6a6f73;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        
+        .btn-logout {
+            background: linear-gradient(135deg, #2d2f31 0%, #1c1d1f 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+        
+        .btn-logout:hover {
+            background: linear-gradient(135deg, #1c1d1f 0%, #000000 100%);
+            box-shadow: 0 4px 12px rgba(28, 29, 31, 0.3);
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .rejection-reason {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            border-left: 4px solid #c62828;
+            padding: 16px;
+            border-radius: 6px;
+            margin-top: 16px;
+        }
+        
+        .rejection-reason strong {
+            color: #c62828;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .layout-wrapper {
+            display: flex;
+            gap: 24px;
+        }
+        
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-nav {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #d1d7dc;
+            position: sticky;
+            top: 24px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 8px;
+            color: #2d2f31;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .nav-item:hover {
+            background: linear-gradient(135deg, #f7f4fd 0%, #f0ebf8 100%);
+            color: #8710d8;
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(164, 53, 240, 0.25);
+        }
+        
+        .nav-item i {
+            margin-right: 12px;
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .nav-badge {
+            margin-left: auto;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 12px;
+            padding: 2px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            min-width: 24px;
+            text-align: center;
+        }
+        
+        .main-content {
+            flex: 1;
+            min-width: 0;
+            max-width: 700px;
+        }
+        
+        /* Facebook-style Post Cards */
+        .post-card {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .post-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        }
+        
+        .post-header {
+            padding: 16px 16px 0 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .post-author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .post-author-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .post-author-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #050505;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .post-meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #65676b;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+        
+        .post-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .post-meta i {
+            font-size: 11px;
+        }
+        
+        .post-meta-separator {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: #65676b;
+        }
+        
+        .post-title {
+            padding: 12px 16px 0 16px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #050505;
+            margin: 0;
+        }
+        
+        .post-content {
+            padding: 8px 16px;
+            color: #050505;
+            font-size: 15px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        /* Quill editor content styling */
+        .post-content p {
+            margin-bottom: 8px;
+        }
+        
+        .post-content strong {
+            font-weight: 600;
+        }
+        
+        .post-content em {
+            font-style: italic;
+        }
+        
+        .post-content u {
+            text-decoration: underline;
+        }
+        
+        .post-content h1, .post-content h2, .post-content h3 {
+            font-weight: 700;
+            margin-top: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .post-content h1 {
+            font-size: 24px;
+        }
+        
+        .post-content h2 {
+            font-size: 20px;
+        }
+        
+        .post-content h3 {
+            font-size: 18px;
+        }
+        
+        .post-content ul, .post-content ol {
+            margin-left: 20px;
+            margin-bottom: 8px;
+        }
+        
+        .post-content a {
+            color: #1877f2;
+            text-decoration: none;
+        }
+        
+        .post-content a:hover {
+            text-decoration: underline;
+        }
+        
+        .post-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin: 8px 0;
+        }
+        
+        /* RTL text support */
+        .post-content .ql-direction-rtl {
+            direction: rtl;
+            text-align: right;
+        }
+        
+        /* Text alignment classes from Quill */
+        .post-content .ql-align-center {
+            text-align: center;
+        }
+        
+        .post-content .ql-align-right {
+            text-align: right;
+        }
+        
+        .post-content .ql-align-justify {
+            text-align: justify;
+        }
+        
+        /* Color and background from Quill */
+        .post-content .ql-font-serif {
+            font-family: Georgia, serif;
+        }
+        
+        .post-content .ql-font-monospace {
+            font-family: Monaco, Courier New, monospace;
+        }
+        
+        /* Preserve Quill's inline styles */
+        .post-content [style] {
+            /* Allow inline styles to work */
+        }
+        
+        .post-badges {
+            padding: 0 16px 12px 16px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .post-footer {
+            border-top: 1px solid #e4e6eb;
+            padding: 12px 16px;
+        }
+        
+        .badge-visibility {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            gap: 4px;
+        }
+        
+        .badge-department {
+            background: #e7f3ff;
+            color: #1877f2;
+        }
+        
+        .badge-class {
+            background: #f0e6ff;
+            color: #8710d8;
+        }
+        
+        .badge-group {
+            background: #e6f7ed;
+            color: #2e7d32;
+        }
+        
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            gap: 4px;
+        }
+        
+        .status-draft {
+            background: #e7f3ff;
+            color: #1565c0;
+        }
+        
+        .status-pending {
+            background: #fff4e6;
+            color: #e65100;
+        }
+        
+        .status-approved {
+            background: #e6f7ed;
+            color: #2e7d32;
+        }
+        
+        .status-rejected {
+            background: #ffebe9;
+            color: #c62828;
+        }
+        
+        .right-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 24px;
+        }
+        
+        .sidebar-card-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #050505;
+            margin-bottom: 16px;
+        }
+        
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-radius: 8px;
+            color: #050505;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            transition: background 0.2s ease;
+        }
+        
+        .sidebar-link:hover {
+            background: #f0f2f5;
+            color: #050505;
+        }
+        
+        .sidebar-link i {
+            margin-right: 12px;
+            color: #65676b;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 8px;
+            border-bottom: 1px solid #e4e6eb;
+        }
+        
+        .stats-item:last-child {
+            border-bottom: none;
+        }
+        
+        .stats-label {
+            color: #65676b;
+            font-size: 14px;
+        }
+        
+        .stats-value {
+            font-weight: 700;
+            color: #050505;
+            font-size: 16px;
+        }
+        
+        .empty-state {
+            background: white;
+            border-radius: 8px;
+            padding: 64px 24px;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .empty-state i {
+            font-size: 64px;
+            color: #bcc0c4;
+            margin-bottom: 16px;
+        }
+        
+        .empty-state h3 {
+            color: #65676b;
+            font-weight: 600;
+            font-size: 18px;
+            margin: 0;
+        }
+        
+        .rejection-reason {
+            background: #ffebe9;
+            border-left: 3px solid #c62828;
+            padding: 12px 16px;
+            margin: 12px 16px;
+            border-radius: 4px;
+        }
+        
+        .rejection-reason strong {
+            color: #c62828;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+        
+        .rejection-reason p {
+            color: #050505;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .post-actions {
+            display: flex;
+            gap: 12px;
+            padding: 12px 16px;
+            border-top: 1px solid #e4e6eb;
+        }
+        
+        .btn-action {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            color: white;
+        }
+        
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #8710d8 0%, #6b0ab0 100%);
+            transform: translateY(-1px);
+        }
+        
+        .btn-approve {
+            background: #42b72a;
+            color: white;
+        }
+        
+        .btn-approve:hover {
+            background: #36a420;
+        }
+        
+        .btn-reject {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn-reject:hover {
+            background: #d32f2f;
+        }
+        
+        @media (max-width: 1200px) {
+            .right-sidebar {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .layout-wrapper {
+                padding: 16px 8px;
+            }
+        }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-chalkboard-teacher"></i> Faculty LMS
+            </a>
+            
+            <div class="user-info">
+                <div class="user-avatar" th:text="${user.firstName.substring(0,1) + user.lastName.substring(0,1)}">AB</div>
+                <div>
+                    <div style="font-weight: 600; color: #1c1d1f; font-size: 14px;" th:text="${user.firstName + ' ' + user.lastName}">Teacher Name</div>
+                    <div style="font-size: 12px; color: #6a6f73;" th:text="${user.role.name() == 'HEAD_OF_DEPARTMENT' ? 'Head of Department' : 'Teacher'}">Teacher</div>
+                </div>
+                <form th:action="@{/logout}" method="post" style="margin: 0;">
+                    <button type="submit" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="main-container">
+        <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+            <div class="layout-wrapper">
+                <!-- Left Sidebar -->
+                <aside class="sidebar">
+                    <div class="sidebar-nav">
+                        <a href="/teacher/dashboard" class="nav-item active">
+                            <i class="fas fa-stream"></i>
+                            <span th:if="${user.role.name() == 'HEAD_OF_DEPARTMENT'}">Department Feed</span>
+                            <span th:if="${user.role.name() != 'HEAD_OF_DEPARTMENT'}">My Feed</span>
+                        </a>
+                        <a href="/teacher/posts/new" class="nav-item">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Create Post</span>
+                        </a>
+                        <a href="/teacher/grades" class="nav-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Manage Grades</span>
+                        </a>
+                        <div th:if="${user.role.name() == 'HEAD_OF_DEPARTMENT'}">
+                            <a href="/teacher/pending-approvals" class="nav-item">
+                                <i class="fas fa-tasks"></i>
+                                <span>Pending Approvals</span>
+                                <span th:if="${pendingCount != null && pendingCount > 0}" 
+                                      class="nav-badge" 
+                                      th:text="${pendingCount}">0</span>
+                            </a>
+                        </div>
+                    </div>
+                </aside>
+                
+                <!-- Main Feed -->
+                <div class="main-content">
+                    <!-- Filter Bar -->
+                    <div class="filter-bar" style="background: white; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);">
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                            <!-- Search Input -->
+                            <div style="flex: 1; min-width: 200px;">
+                                <div style="position: relative;">
+                                    <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #65676b;"></i>
+                                    <input 
+                                        type="text" 
+                                        id="searchInput" 
+                                        placeholder="Search posts..." 
+                                        style="width: 100%; padding: 10px 12px 10px 36px; border: 1px solid #d1d7dc; border-radius: 6px; font-size: 14px; outline: none;"
+                                        oninput="filterPosts()"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <!-- Status Filter (for teachers) -->
+                            <select id="statusFilter" onchange="filterPosts()" style="padding: 10px 12px; border: 1px solid #d1d7dc; border-radius: 6px; font-size: 14px; outline: none; cursor: pointer; background: white;" th:if="${user.role.name() != 'HEAD_OF_DEPARTMENT'}">
+                                <option value="">All Status</option>
+                                <option value="DRAFT">Draft</option>
+                                <option value="PENDING_APPROVAL">Pending</option>
+                                <option value="APPROVED">Approved</option>
+                                <option value="REJECTED">Rejected</option>
+                            </select>
+                            
+                            <!-- Visibility Filter -->
+                            <select id="visibilityFilter" onchange="filterPosts()" style="padding: 10px 12px; border: 1px solid #d1d7dc; border-radius: 6px; font-size: 14px; outline: none; cursor: pointer; background: white;">
+                                <option value="">All Visibility</option>
+                                <option value="DEPARTMENT">Department</option>
+                                <option value="CLASS">Class</option>
+                                <option value="GROUP">Group</option>
+                            </select>
+                            
+                            <!-- Date Filter -->
+                            <select id="dateFilter" onchange="filterPosts()" style="padding: 10px 12px; border: 1px solid #d1d7dc; border-radius: 6px; font-size: 14px; outline: none; cursor: pointer; background: white;">
+                                <option value="">All Time</option>
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                            </select>
+                            
+                            <!-- Sort Order -->
+                            <select id="sortOrder" onchange="filterPosts()" style="padding: 10px 12px; border: 1px solid #d1d7dc; border-radius: 6px; font-size: 14px; outline: none; cursor: pointer; background: white;">
+                                <option value="newest">Newest First</option>
+                                <option value="oldest">Oldest First</option>
+                            </select>
+                            
+                            <!-- Clear Filters Button -->
+                            <button onclick="clearFilters()" style="padding: 10px 16px; background: #f0f2f5; border: 1px solid #d1d7dc; border-radius: 6px; font-size: 14px; font-weight: 600; color: #050505; cursor: pointer; transition: background 0.2s ease;" onmouseover="this.style.background='#e4e6eb'" onmouseout="this.style.background='#f0f2f5'">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                        </div>
+                        
+                        <!-- Filter Results Count -->
+                        <div id="filterCount" style="margin-top: 12px; font-size: 13px; color: #65676b; display: none;">
+                            <i class="fas fa-info-circle"></i> <span id="filterCountText"></span>
+                        </div>
+                    </div>
+                    
+                    <div id="emptyState" th:if="${posts.isEmpty()}" class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No posts yet</h3>
+                        <p style="color: #65676b; margin-top: 8px;">
+                            <span th:if="${user.role.name() == 'HEAD_OF_DEPARTMENT'}">No posts have been published in your department yet</span>
+                            <span th:if="${user.role.name() != 'HEAD_OF_DEPARTMENT'}">Create your first post to share with students</span>
+                        </p>
+                    </div>
+                    
+                    <div id="postsContainer">
+                        <div th:each="post : ${posts}" 
+                             class="post-card" 
+                             data-post-item
+                             th:data-title="${post.title.toLowerCase()}"
+                             th:data-content="${#strings.toLowerCase(#strings.unescapeJava(post.content))}"
+                             th:data-author="${post.authorName.toLowerCase()}"
+                             th:data-visibility="${post.visibility.name()}"
+                             th:data-status="${post.status.name()}"
+                             th:data-created="${post.createdAt}"
+                             th:data-department="${post.targetDepartmentName != null ? post.targetDepartmentName.toLowerCase() : ''}"
+                             th:data-class="${post.targetClassName != null ? post.targetClassName.toLowerCase() : ''}"
+                             th:data-group="${post.targetGroupName != null ? post.targetGroupName.toLowerCase() : ''}">
+                        <!-- Post Header with Author Info -->
+                        <div class="post-header">
+                            <div class="post-author-avatar" 
+                                 th:text="${post.authorName.substring(0,1)}">A</div>
+                            <div class="post-author-info">
+                                <div class="post-author-name" th:text="${post.authorName}">Author Name</div>
+                                <div class="post-meta">
+                                    <span th:text="${#temporals.format(post.createdAt, 'MMM d')}">Dec 14</span>
+                                    <span class="post-meta-separator"></span>
+                                    <span><i class="fas fa-clock"></i> <span th:text="${#temporals.format(post.createdAt, 'HH:mm')}">14:30</span></span>
+                                    <span class="post-meta-separator"></span>
+                                    <span th:if="${post.targetGroupName != null}">
+                                        <i class="fas fa-users"></i> <span th:text="${post.targetGroupName}">Group 1</span>
+                                    </span>
+                                    <span th:if="${post.targetClassName != null && post.targetGroupName == null}">
+                                        <i class="fas fa-chalkboard"></i> <span th:text="${post.targetClassName}">Class 1</span>
+                                    </span>
+                                    <span th:if="${post.targetDepartmentName != null && post.targetClassName == null}">
+                                        <i class="fas fa-building"></i> <span th:text="${post.targetDepartmentName}">Department</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Post Title & Content -->
+                        <h2 class="post-title" th:text="${post.title}">Post Title</h2>
+                        <div class="post-content" th:utext="${post.content}">Post content...</div>
+                        
+                        <!-- Badges -->
+                        <div class="post-badges">
+                            <span th:if="${post.visibility.name() == 'DEPARTMENT'}" class="badge-visibility badge-department">
+                                <i class="fas fa-building"></i> Department
+                            </span>
+                            <span th:if="${post.visibility.name() == 'CLASS'}" class="badge-visibility badge-class">
+                                <i class="fas fa-chalkboard"></i> Class
+                            </span>
+                            <span th:if="${post.visibility.name() == 'GROUP'}" class="badge-visibility badge-group">
+                                <i class="fas fa-users"></i> Group
+                            </span>
+                            
+                            <!-- Status Badge -->
+                            <span th:if="${user.role.name() != 'HEAD_OF_DEPARTMENT' && post.status.name() == 'DRAFT'}" class="badge-status status-draft">
+                                <i class="fas fa-file"></i> Draft
+                            </span>
+                            <span th:if="${user.role.name() != 'HEAD_OF_DEPARTMENT' && post.status.name() == 'PENDING_APPROVAL'}" class="badge-status status-pending">
+                                <i class="fas fa-clock"></i> Pending Approval
+                            </span>
+                            <span th:if="${user.role.name() != 'HEAD_OF_DEPARTMENT' && post.status.name() == 'REJECTED'}" class="badge-status status-rejected">
+                                <i class="fas fa-times-circle"></i> Rejected
+                            </span>
+                            <span th:if="${user.role.name() == 'HEAD_OF_DEPARTMENT' || (user.role.name() != 'HEAD_OF_DEPARTMENT' && post.status.name() == 'APPROVED')}" class="badge-status status-approved">
+                                <i class="fas fa-check-circle"></i> Published
+                            </span>
+                        </div>
+                        
+                        <!-- Rejection Reason -->
+                        <div th:if="${user.role.name() != 'HEAD_OF_DEPARTMENT' && post.rejectionReason != null}" class="rejection-reason">
+                            <strong><i class="fas fa-exclamation-triangle"></i> Rejection Reason</strong>
+                            <p th:text="${post.rejectionReason}">Reason text</p>
+                        </div>
+                        
+                        <!-- Actions for Draft Posts -->
+                        <div th:if="${user.role.name() != 'HEAD_OF_DEPARTMENT' && post.status.name() == 'DRAFT'}" class="post-actions">
+                            <button class="btn-action btn-submit" th:onclick="'submitPost(' + ${post.id} + ')'">
+                                <i class="fas fa-paper-plane"></i> Submit for Approval
+                            </button>
+                        </div>
+                    </div>
+                    </div> <!-- end postsContainer -->
+                    
+                    <!-- No Results State -->
+                    <div id="noResultsState" class="empty-state" style="display: none;">
+                        <i class="fas fa-search"></i>
+                        <h3>No posts found</h3>
+                        <p style="color: #65676b; margin-top: 8px;">Try adjusting your filters</p>
+                    </div>
+                </div>
+                
+                <!-- Right Sidebar -->
+                <aside class="right-sidebar">
+                    <div class="sidebar-card">
+                        <div class="sidebar-card-title">Your Stats</div>
+                        <div class="stats-item">
+                            <span class="stats-label">Total Posts</span>
+                            <span class="stats-value" th:text="${posts.size()}">0</span>
+                        </div>
+                        <div class="stats-item" th:if="${user.role.name() != 'HEAD_OF_DEPARTMENT'}">
+                            <span class="stats-label">Approved</span>
+                            <span class="stats-value" th:text="${posts.stream().filter(p -> p.status.name() == 'APPROVED').count()}">0</span>
+                        </div>
+                        <div class="stats-item" th:if="${user.role.name() != 'HEAD_OF_DEPARTMENT'}">
+                            <span class="stats-label">Pending</span>
+                            <span class="stats-value" th:text="${posts.stream().filter(p -> p.status.name() == 'PENDING_APPROVAL').count()}">0</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Department</span>
+                            <span class="stats-value" th:text="${teacher.department.name}">CS</span>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function submitPost(postId) {
+            fetch(`/api/posts/${postId}/submit`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    console.error('Failed to submit post');
+                }
+            });
+        }
+        
+        // Filter posts function
+        function filterPosts() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilterEl = document.getElementById('statusFilter');
+            const statusFilter = statusFilterEl ? statusFilterEl.value : '';
+            const visibilityFilter = document.getElementById('visibilityFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            const sortOrder = document.getElementById('sortOrder').value;
+            
+            const posts = Array.from(document.querySelectorAll('[data-post-item]'));
+            let visibleCount = 0;
+            
+            // Calculate date ranges
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const weekAgo = new Date(today);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            const monthAgo = new Date(today);
+            monthAgo.setMonth(monthAgo.getMonth() - 1);
+            
+            // Filter posts
+            posts.forEach(post => {
+                const title = post.dataset.title || '';
+                const content = post.dataset.content || '';
+                const author = post.dataset.author || '';
+                const visibility = post.dataset.visibility || '';
+                const status = post.dataset.status || '';
+                const created = new Date(post.dataset.created);
+                const department = post.dataset.department || '';
+                const className = post.dataset.class || '';
+                const groupName = post.dataset.group || '';
+                
+                // Search filter
+                const searchMatch = searchText === '' || 
+                    title.includes(searchText) || 
+                    content.includes(searchText) || 
+                    author.includes(searchText) ||
+                    department.includes(searchText) ||
+                    className.includes(searchText) ||
+                    groupName.includes(searchText);
+                
+                // Status filter (for teachers)
+                const statusMatch = statusFilter === '' || status === statusFilter;
+                
+                // Visibility filter
+                const visibilityMatch = visibilityFilter === '' || visibility === visibilityFilter;
+                
+                // Date filter
+                let dateMatch = true;
+                if (dateFilter === 'today') {
+                    dateMatch = created >= today;
+                } else if (dateFilter === 'week') {
+                    dateMatch = created >= weekAgo;
+                } else if (dateFilter === 'month') {
+                    dateMatch = created >= monthAgo;
+                }
+                
+                // Show/hide post
+                if (searchMatch && statusMatch && visibilityMatch && dateMatch) {
+                    post.style.display = '';
+                    visibleCount++;
+                } else {
+                    post.style.display = 'none';
+                }
+            });
+            
+            // Sort posts
+            const container = document.getElementById('postsContainer');
+            const visiblePosts = posts.filter(p => p.style.display !== 'none');
+            
+            visiblePosts.sort((a, b) => {
+                const dateA = new Date(a.dataset.created);
+                const dateB = new Date(b.dataset.created);
+                return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+            });
+            
+            // Reorder DOM
+            visiblePosts.forEach(post => container.appendChild(post));
+            
+            // Update UI
+            const emptyState = document.getElementById('emptyState');
+            const noResultsState = document.getElementById('noResultsState');
+            const filterCount = document.getElementById('filterCount');
+            const filterCountText = document.getElementById('filterCountText');
+            const totalPosts = posts.length;
+            
+            if (totalPosts === 0) {
+                if (emptyState) emptyState.style.display = '';
+                if (noResultsState) noResultsState.style.display = 'none';
+                filterCount.style.display = 'none';
+            } else if (visibleCount === 0) {
+                if (emptyState) emptyState.style.display = 'none';
+                noResultsState.style.display = '';
+                filterCount.style.display = 'none';
+            } else {
+                if (emptyState) emptyState.style.display = 'none';
+                noResultsState.style.display = 'none';
+                
+                // Show filter count if filters are active
+                const hasActiveFilters = searchText !== '' || statusFilter !== '' || visibilityFilter !== '' || dateFilter !== '';
+                if (hasActiveFilters) {
+                    filterCount.style.display = '';
+                    filterCountText.textContent = `Showing ${visibleCount} of ${totalPosts} posts`;
+                } else {
+                    filterCount.style.display = 'none';
+                }
+            }
+        }
+        
+        // Clear all filters
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            const statusFilterEl = document.getElementById('statusFilter');
+            if (statusFilterEl) statusFilterEl.value = '';
+            document.getElementById('visibilityFilter').value = '';
+            document.getElementById('dateFilter').value = '';
+            document.getElementById('sortOrder').value = 'newest';
+            filterPosts();
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            filterPosts();
+        });
+    </script>
+</body>
+</html>

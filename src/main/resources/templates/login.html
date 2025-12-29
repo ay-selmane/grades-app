@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Faculty LMS</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f7f9fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 12px;
+            padding: 50px 40px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .logo i {
+            font-size: 48px;
+            color: #2d2f31;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1c1d1f;
+            margin-top: 15px;
+        }
+        
+        .logo p {
+            color: #6a6f73;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .form-label {
+            font-weight: 700;
+            color: #1c1d1f;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #d1d7dc;
+            padding: 12px 15px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #a435f0;
+            box-shadow: 0 0 0 4px rgba(164, 53, 240, 0.1);
+            outline: none;
+        }
+        
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(164, 53, 240, 0.25);
+        }
+        
+        .btn-login:hover {
+            background: linear-gradient(135deg, #8710d8 0%, #6b0ab0 100%);
+            box-shadow: 0 6px 20px rgba(164, 53, 240, 0.35);
+            transform: translateY(-2px);
+        }
+        
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+        }
+        
+        .divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: 1px;
+            background: #d1d7dc;
+        }
+        
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            position: relative;
+            color: #6a6f73;
+            font-size: 14px;
+        }
+        
+        .demo-credentials {
+            background: #f7f9fa;
+            border: 1px solid #d1d7dc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .demo-credentials h6 {
+            font-weight: 700;
+            color: #1c1d1f;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .demo-item {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #d1d7dc;
+        }
+        
+        .demo-item:hover {
+            border-color: #a435f0;
+            background: linear-gradient(135deg, #fcfbfd 0%, #faf9fc 100%);
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(164, 53, 240, 0.15);
+        }
+        
+        .demo-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .demo-item strong {
+            color: #2d2f31;
+            display: block;
+            font-size: 13px;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+        
+        .demo-item small {
+            color: #6a6f73;
+            font-size: 12px;
+        }
+        
+        .alert {
+            border-radius: 2px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <h1>Faculty LMS</h1>
+                <p>Log in to your account</p>
+            </div>
+            
+            <!-- Error Message -->
+            <div th:if="${param.error}" class="alert alert-danger">
+                Invalid username or password
+            </div>
+            
+            <!-- Logout Message -->
+            <div th:if="${param.logout}" class="alert alert-success">
+                You have been logged out successfully
+            </div>
+            
+            <!-- Login Form -->
+            <form th:action="@{/perform-login}" method="post">
+                <div class="mb-3">
+                    <label class="form-label" for="username">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" required autofocus>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                
+                <button type="submit" class="btn-login">Log In</button>
+            </form>
+            
+            <div class="divider">
+                <span>Demo Accounts</span>
+            </div>
+            
+            <!-- Demo Credentials -->
+            <div class="demo-credentials">
+                <h6>Quick Access</h6>
+                <div class="demo-item" onclick="fillLogin('admin', 'admin123')">
+                    <strong>Administrator</strong>
+                    <small>admin / admin123</small>
+                </div>
+                <div class="demo-item" onclick="fillLogin('hod', 'hod123')">
+                    <strong>Head of Department</strong>
+                    <small>hod / hod123</small>
+                </div>
+                <div class="demo-item" onclick="fillLogin('teacher1', 'teacher123')">
+                    <strong>Teacher</strong>
+                    <small>teacher1 / teacher123</small>
+                </div>
+                <div class="demo-item" onclick="fillLogin('student1', 'student123')">
+                    <strong>Student</strong>
+                    <small>student1 / student123</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function fillLogin(username, password) {
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+        }
+    </script>
+</body>
+</html>

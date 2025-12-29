@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Faculty LMS</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f7f9fa; min-height: 100vh; }
+        .navbar { background: white !important; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); padding: 16px 0; border-bottom: 1px solid #d1d7dc; }
+        .navbar-brand { font-weight: 700; color: #1c1d1f !important; font-size: 20px; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px; }
+        .main-container { padding: 32px 0; }
+        .page-header { background: white; border-radius: 12px; padding: 32px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); border: 1px solid #d1d7dc; }
+        .page-header h1 { font-size: 32px; font-weight: 700; color: #1c1d1f; margin-bottom: 8px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 24px; }
+        .stat-card { background: linear-gradient(135deg, #f7f9fa 0%, #ffffff 100%); padding: 24px; border-radius: 8px; border: 1px solid #d1d7dc; transition: all 0.2s ease; }
+        .stat-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); transform: translateY(-2px); border-color: #a435f0; }
+        .stat-card i { font-size: 32px; color: #a435f0; margin-bottom: 12px; }
+        .stat-number { font-size: 36px; font-weight: 700; color: #1c1d1f; margin: 8px 0; }
+        .stat-label { font-size: 14px; color: #6a6f73; font-weight: 600; }
+        .section { background: white; border-radius: 12px; padding: 32px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); border: 1px solid #d1d7dc; }
+        .section-title { font-size: 24px; font-weight: 700; color: #1c1d1f; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #f7f9fa; display: flex; justify-content: space-between; align-items: center; }
+        .btn-add { background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(164, 53, 240, 0.25); }
+        .btn-add:hover { background: linear-gradient(135deg, #8710d8 0%, #6b0ab0 100%); box-shadow: 0 4px 12px rgba(164, 53, 240, 0.35); transform: translateY(-2px); color: white; }
+        table { width: 100%; }
+        thead { background: #f7f9fa; }
+        thead th { padding: 16px; font-weight: 700; color: #1c1d1f; border-bottom: 2px solid #d1d7dc; font-size: 14px; }
+        tbody td { padding: 16px; border-bottom: 1px solid #f7f9fa; vertical-align: middle; color: #2d2f31; }
+        tbody tr:hover { background: #f7f9fa; }
+        .badge-custom { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; }
+        .badge-department { background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); color: #1565c0; }
+        .badge-class { background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); color: #6a1b9a; }
+        .badge-group { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); color: #2e7d32; }
+        .btn-sm-action { padding: 8px 16px; font-size: 13px; border-radius: 6px; border: none; cursor: pointer; transition: all 0.2s ease; margin-right: 8px; font-weight: 600; }
+        .btn-edit { background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%); color: white; box-shadow: 0 2px 6px rgba(76, 175, 80, 0.2); }
+        .btn-edit:hover { background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%); box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3); transform: translateY(-1px); }
+        .btn-logout { background: linear-gradient(135deg, #2d2f31 0%, #1c1d1f 100%); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; transition: all 0.2s ease; font-size: 14px; }
+        .btn-logout:hover { background: linear-gradient(135deg, #1c1d1f 0%, #000000 100%); box-shadow: 0 4px 12px rgba(28, 29, 31, 0.3); transform: translateY(-2px); color: white; }
+        .empty-state { text-align: center; padding: 64px 24px; }
+        .empty-state i { font-size: 64px; color: #d1d7dc; margin-bottom: 16px; }
+        .empty-state h3 { color: #6a6f73; font-weight: 600; font-size: 18px; }
+        .modal-content { border-radius: 12px; border: none; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15); }
+        .modal-header { background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%); color: white; border-radius: 12px 12px 0 0; padding: 24px 32px; border: none; }
+        .modal-title { font-weight: 700; }
+        .modal-body { padding: 32px; }
+        .form-label { font-weight: 700; color: #1c1d1f; margin-bottom: 8px; font-size: 14px; }
+        .form-control, .form-select { border-radius: 8px; border: 1px solid #d1d7dc; padding: 12px 15px; transition: all 0.2s ease; }
+        .form-control:focus, .form-select:focus { border-color: #a435f0; box-shadow: 0 0 0 4px rgba(164, 53, 240, 0.1); }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fas fa-user-shield"></i> Faculty LMS</a>
+            <div class="d-flex gap-3">
+                <a href="/admin/manage" class="btn-add" style="text-decoration: none;">
+                    <i class="fas fa-cogs"></i> System Management
+                </a>
+                <div class="user-info">
+                    <div class="user-avatar" th:text="${user.firstName.substring(0,1) + user.lastName.substring(0,1)}">AB</div>
+                    <div>
+                        <div style="font-weight: 600; color: #1c1d1f; font-size: 14px;" th:text="${user.firstName + ' ' + user.lastName}">Admin Name</div>
+                        <div style="font-size: 12px; color: #6a6f73;">Administrator</div>
+                    </div>
+                    <form th:action="@{/logout}" method="post" style="margin: 0;">
+                        <button type="submit" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="main-container">
+        <div class="container">
+            <div class="page-header">
+                <h1>Admin Dashboard</h1>
+                <p style="color: #6a6f73; font-size: 16px; margin: 0;">Manage students, teachers, and class assignments</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-user-graduate"></i>
+                        <div class="stat-number" th:text="${students.size()}">0</div>
+                        <div class="stat-label">Total Students</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <div class="stat-number" th:text="${teachers.size()}">0</div>
+                        <div class="stat-label">Total Teachers</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-school"></i>
+                        <div class="stat-number" th:text="${classes.size()}">0</div>
+                        <div class="stat-label">Total Classes</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <div class="stat-number" th:text="${groups.size()}">0</div>
+                        <div class="stat-label">Total Groups</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">
+                    <span><i class="fas fa-user-graduate" style="color: #a435f0;"></i> Students Management</span>
+                    <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+                        <i class="fas fa-plus"></i> Add Student
+                    </button>
+                </div>
+                
+                <div th:if="${students.isEmpty()}" class="empty-state">
+                    <i class="fas fa-user-graduate"></i>
+                    <h3>No students yet</h3>
+                    <p style="color: #6a6f73; margin-top: 8px;">Add students to get started</p>
+                </div>
+                
+                <div th:if="${!students.isEmpty()}" class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Department</th>
+                                <th>Class</th>
+                                <th>Group</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="student : ${students}">
+                                <td th:text="${student.studentId}">S001</td>
+                                <td th:text="${student.user.firstName + ' ' + student.user.lastName}">Student Name</td>
+                                <td th:text="${student.user.email}">email@example.com</td>
+                                <td><span class="badge-custom badge-department" th:text="${student.department?.name ?: 'Not Assigned'}">Dept</span></td>
+                                <td><span class="badge-custom badge-class" th:text="${student.studentClass?.name ?: 'Not Assigned'}">Class</span></td>
+                                <td><span class="badge-custom badge-group" th:text="${student.group?.name ?: 'Not Assigned'}">Group</span></td>
+                                <td><button class="btn-sm-action btn-edit" th:onclick="'editStudent(' + ${student.id} + ')'"><i class="fas fa-edit"></i> Edit</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">
+                    <span><i class="fas fa-chalkboard-teacher" style="color: #a435f0;"></i> Teachers Management</span>
+                    <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
+                        <i class="fas fa-plus"></i> Add Teacher
+                    </button>
+                </div>
+                
+                <div th:if="${teachers.isEmpty()}" class="empty-state">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <h3>No teachers yet</h3>
+                    <p style="color: #6a6f73; margin-top: 8px;">Add teachers to get started</p>
+                </div>
+                
+                <div th:if="${!teachers.isEmpty()}" class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Department</th>
+                                <th>Specialization</th>
+                                <th>Office</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="teacher : ${teachers}">
+                                <td th:text="${teacher.user.firstName + ' ' + teacher.user.lastName}">Teacher Name</td>
+                                <td th:text="${teacher.user.email}">email@example.com</td>
+                                <td><span class="badge-custom badge-department" th:text="${teacher.department.name}">Dept</span></td>
+                                <td th:text="${teacher.specialization ?: '-'}">Specialization</td>
+                                <td th:text="${teacher.officeLocation ?: '-'}">Office</td>
+                                <td><button class="btn-sm-action btn-edit" th:onclick="'editTeacher(' + ${teacher.id} + ')'"><i class="fas fa-edit"></i> Edit</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div class="modal fade" id="addStudentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Student</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addStudentForm" onsubmit="addStudent(event)">
+                        <div class="mb-3">
+                            <label class="form-label">Student ID</label>
+                            <input type="text" class="form-control" name="studentId" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" name="firstName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" name="lastName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Department</label>
+                            <select class="form-select" name="departmentId" required>
+                                <option value="">Select Department</option>
+                                <option th:each="dept : ${departments}" th:value="${dept.id}" th:text="${dept.name}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Class</label>
+                            <select class="form-select" name="classId">
+                                <option value="">Select Class</option>
+                                <option th:each="cls : ${classes}" th:value="${cls.id}" th:text="${cls.name}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Group</label>
+                            <select class="form-select" name="groupId">
+                                <option value="">Select Group</option>
+                                <option th:each="grp : ${groups}" th:value="${grp.id}" th:text="${grp.name}"></option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-add w-100"><i class="fas fa-save"></i> Save Student</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="addTeacherModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Teacher</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addTeacherForm" onsubmit="addTeacher(event)">
+                        <div class="mb-3">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" name="firstName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" name="lastName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" name="password" required minlength="6">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Department</label>
+                            <select class="form-select" name="departmentId" required>
+                                <option value="">Select Department</option>
+                                <option th:each="dept : ${departments}" th:value="${dept.id}" th:text="${dept.name}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Specialization</label>
+                            <input type="text" class="form-control" name="specialization">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Office Location</label>
+                            <input type="text" class="form-control" name="officeLocation">
+                        </div>
+                        <button type="submit" class="btn-add w-100"><i class="fas fa-save"></i> Save Teacher</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function addStudent(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            fetch('/api/students', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Failed to add student');
+                }
+            });
+        }
+        
+        function addTeacher(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            fetch('/api/teachers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Failed to add teacher');
+                }
+            });
+        }
+        
+        function editStudent(id) {
+            alert('Edit student functionality would open a modal with student ID: ' + id);
+        }
+        
+        function editTeacher(id) {
+            alert('Edit teacher functionality would open a modal with teacher ID: ' + id);
+        }
+    </script>
+</body>
+</html>

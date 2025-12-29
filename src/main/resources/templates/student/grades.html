@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Grades - Faculty LMS</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: white !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            padding: 16px 0;
+            border-bottom: 1px solid #d1d7dc;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: #1c1d1f !important;
+            font-size: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .main-container {
+            padding: 32px 0;
+        }
+        
+        .btn-logout {
+            background: linear-gradient(135deg, #2d2f31 0%, #1c1d1f 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+        
+        .btn-logout:hover {
+            background: linear-gradient(135deg, #1c1d1f 0%, #000000 100%);
+            box-shadow: 0 4px 12px rgba(28, 29, 31, 0.3);
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .layout-wrapper {
+            display: flex;
+            gap: 24px;
+        }
+        
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-nav {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 24px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            color: #050505;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            margin-bottom: 4px;
+            transition: background 0.2s ease;
+        }
+        
+        .nav-item:hover {
+            background: #f0f2f5;
+            color: #050505;
+        }
+        
+        .nav-item.active {
+            background: #e7f3ff;
+            color: #1877f2;
+        }
+        
+        .nav-item i {
+            margin-right: 12px;
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            flex: 1;
+            min-width: 0;
+            max-width: 700px;
+        }
+        
+        .right-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 24px;
+        }
+        
+        .sidebar-card-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #050505;
+            margin-bottom: 16px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 8px;
+            border-bottom: 1px solid #e4e6eb;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: #65676b;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            color: #050505;
+            font-size: 14px;
+            text-align: right;
+        }
+        
+        /* Current Selection Display */
+        .current-selection {
+            background: linear-gradient(135deg, #f7f9fa 0%, #ffffff 100%);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 12px;
+        }
+        
+        .selection-item {
+            text-align: center;
+            padding: 8px 0;
+        }
+        
+        .selection-label {
+            font-size: 12px;
+            color: #65676b;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .selection-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #a435f0;
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .selection-divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #e4e6eb, transparent);
+            margin: 16px 0;
+        }
+        
+        /* Semester Toggle Buttons */
+        .semester-toggle {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .semester-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 14px 18px;
+            background: white;
+            border: 2px solid #e4e6eb;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1c1d1f;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .semester-btn i {
+            font-size: 18px;
+            color: #6a6f73;
+            transition: color 0.3s ease;
+        }
+        
+        .semester-btn:hover {
+            background: #f7f9fa;
+            border-color: #a435f0;
+            transform: translateX(4px);
+        }
+        
+        .semester-btn.active {
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            border-color: #a435f0;
+            color: white;
+            box-shadow: 0 4px 12px rgba(164, 53, 240, 0.3);
+        }
+        
+        .semester-btn.active i {
+            color: white;
+        }
+        
+        .semester-card {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        /* Tab navigation styles (like admin management) */
+        .nav-tabs {
+            border-bottom: 2px solid #d1d7dc;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            color: #6a6f73;
+            font-weight: 600;
+            padding: 12px 24px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .nav-tabs .nav-link:hover {
+            color: #a435f0;
+            background: #f7f9fa;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: #fff;
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            border-radius: 6px 6px 0 0;
+            box-shadow: 0 -2px 8px rgba(164, 53, 240, 0.2);
+        }
+        
+        .nav-tabs .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #a435f0;
+        }
+        
+        .semester-header {
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .semester-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .semester-average {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .grades-table thead {
+            background: #f7f9fa;
+        }
+        
+        .grades-table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            color: #6a6f73;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e4e6eb;
+        }
+        
+        .grades-table th.text-center {
+            text-align: center;
+        }
+        
+        .grades-table tbody tr {
+            border-bottom: 1px solid #e4e6eb;
+            transition: background 0.2s ease;
+        }
+        
+        .grades-table tbody tr:hover {
+            background: #f7f9fa;
+        }
+        
+        .grades-table tbody tr:last-child {
+            border-bottom: none;
+        }
+        
+        .grades-table td {
+            padding: 16px;
+            font-size: 14px;
+            color: #1c1d1f;
+        }
+        
+        .grades-table td.text-center {
+            text-align: center;
+        }
+        
+        .subject-name {
+            font-weight: 600;
+            color: #1c1d1f;
+        }
+        
+        .subject-code {
+            font-size: 12px;
+            color: #6a6f73;
+            margin-top: 2px;
+        }
+        
+        .grade-value {
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            min-width: 50px;
+            text-align: center;
+        }
+        
+        .grade-excellent {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .grade-good {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .grade-average {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .grade-poor {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .grade-missing {
+            background: #e2e3e5;
+            color: #6c757d;
+        }
+        
+        .coefficient-badge {
+            background: #e7f3ff;
+            color: #1877f2;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .overall-summary {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 2px solid #a435f0;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .summary-item {
+            text-align: center;
+            padding: 16px;
+            background: #f7f9fa;
+            border-radius: 8px;
+        }
+        
+        .summary-label {
+            font-size: 12px;
+            color: #6a6f73;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .summary-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1c1d1f;
+        }
+        
+        .summary-value.excellent {
+            color: #155724;
+        }
+        
+        .summary-value.good {
+            color: #0c5460;
+        }
+        
+        .summary-value.average {
+            color: #856404;
+        }
+        
+        .summary-value.poor {
+            color: #721c24;
+        }
+        
+        .empty-state {
+            background: white;
+            border-radius: 8px;
+            padding: 64px 24px;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .empty-state i {
+            font-size: 64px;
+            color: #bcc0c4;
+            margin-bottom: 16px;
+        }
+        
+        .empty-state h3 {
+            color: #65676b;
+            font-weight: 600;
+            font-size: 18px;
+            margin: 0;
+        }
+        
+        @media (max-width: 1200px) {
+            .right-sidebar {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .main-content {
+                max-width: 100%;
+            }
+            
+            .grades-table {
+                font-size: 12px;
+            }
+            
+            .grades-table th,
+            .grades-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-graduation-cap"></i> Faculty LMS
+            </a>
+            
+            <div class="user-info">
+                <div class="user-avatar" th:text="${user.firstName.substring(0,1) + user.lastName.substring(0,1)}">AB</div>
+                <div>
+                    <div style="font-weight: 600; color: #1c1d1f; font-size: 14px;" th:text="${user.firstName + ' ' + user.lastName}">Student Name</div>
+                    <div style="font-size: 12px; color: #6a6f73;">Student</div>
+                </div>
+                <form th:action="@{/logout}" method="post" style="margin: 0;">
+                    <button type="submit" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="main-container">
+        <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+            <div class="layout-wrapper">
+                <!-- Left Sidebar -->
+                <aside class="sidebar">
+                    <div class="sidebar-nav">
+                        <a href="/student/dashboard" class="nav-item">
+                            <i class="fas fa-stream"></i>
+                            <span>My Feed</span>
+                        </a>
+                        <a href="#" class="nav-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Schedule</span>
+                        </a>
+                        <a href="#" class="nav-item">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>My Courses</span>
+                        </a>
+                        <a href="/student/grades" class="nav-item active">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Grades</span>
+                        </a>
+                    </div>
+                </aside>
+                
+                <!-- Main Content -->
+                <div class="main-content">
+                    
+
+                    <!-- Empty State -->
+                    <div th:if="${gradeRows == null || gradeRows.isEmpty()}" class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>No grades yet</h3>
+                        <p style="color: #65676b; margin-top: 8px;">Your grades will appear here once they are entered by your teachers</p>
+                    </div>
+
+                    <!-- Grades Content (No Tabs in Middle) -->
+                    <div th:if="${gradeRows != null && !gradeRows.isEmpty()}">
+                        <!-- Semester 1 Grades -->
+                        <div class="semester-section" id="semester1" style="display:block;">
+                            <!-- Semester 1 Summary -->
+                            <div class="semester-card" style="margin-bottom:16px; border-left:4px solid #a435f0;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 24px;">
+                                    <h3 style="margin:0; font-size:18px; font-weight:700; color:#1c1d1f;">
+                                        <i class="fas fa-chart-line" style="color:#a435f0;"></i> Semester 1 Average
+                                    </h3>
+                                    <div class="summary-value" id="semester1Average" style="font-size:28px; font-weight:700;">--</div>
+                                </div>
+                            </div>
+
+                            <!-- Semester 1 Grades Table -->
+                            <div class="semester-card">
+                                <table class="grades-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th class="text-center">Coef.</th>
+                                            <th class="text-center">Exam</th>
+                                            <th class="text-center">TD</th>
+                                            <th class="text-center">TP</th>
+                                            <th class="text-center">Final</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="row : ${gradeRows}" th:if="${row.semester == 1}" th:attr="data-semester=${row.semester}, data-academicyear=${row.academicYear}">
+                                            <td>
+                                                <div class="subject-name" th:text="${row.subjectName}">Subject Name</div>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="coefficient-badge" th:text="${row.coefficient}">3</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span th:if="${row.examen != null}" 
+                                                      th:text="${#numbers.formatDecimal(row.examen, 1, 2)}"
+                                                      th:classappend="${row.examen >= 16 ? 'grade-excellent' : row.examen >= 14 ? 'grade-good' : row.examen >= 10 ? 'grade-average' : 'grade-poor'}"
+                                                      class="grade-value">15.00</span>
+                                                <span th:if="${row.examen == null}" class="grade-value grade-missing">-</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span th:if="${row.td != null}" 
+                                                      th:text="${#numbers.formatDecimal(row.td, 1, 2)}"
+                                                      th:classappend="${row.td >= 16 ? 'grade-excellent' : row.td >= 14 ? 'grade-good' : row.td >= 10 ? 'grade-average' : 'grade-poor'}"
+                                                      class="grade-value">12.00</span>
+                                                <span th:if="${row.td == null}" class="grade-value grade-missing">-</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span th:if="${row.tp != null}" 
+                                                      th:text="${#numbers.formatDecimal(row.tp, 1, 2)}"
+                                                      th:classappend="${row.tp >= 16 ? 'grade-excellent' : row.tp >= 14 ? 'grade-good' : row.tp >= 10 ? 'grade-average' : 'grade-poor'}"
+                                                      class="grade-value">14.00</span>
+                                                <span th:if="${row.tp == null}" class="grade-value grade-missing">-</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span th:if="${row.finalGrade != null}" 
+                                                      th:text="${#numbers.formatDecimal(row.finalGrade, 1, 2)}"
+                                                      th:classappend="${row.finalGrade >= 16 ? 'grade-excellent' : row.finalGrade >= 14 ? 'grade-good' : row.finalGrade >= 10 ? 'grade-average' : 'grade-poor'}"
+                                                      class="grade-value"
+                                                      th:attr="data-final=${row.finalGrade}, data-coef=${row.coefficient}">13.67</span>
+                                                <span th:if="${row.finalGrade == null}" class="grade-value grade-missing">-</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Semester 2 Grades -->
+                        <div class="semester-section" id="semester2" style="display:none;">
+                            <!-- Semester 2 Summary -->
+                            <div class="semester-card" style="margin-bottom:16px; border-left:4px solid #8710d8;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 24px;">
+                                    <h3 style="margin:0; font-size:18px; font-weight:700; color:#1c1d1f;">
+                                        <i class="fas fa-chart-line" style="color:#8710d8;"></i> Semester 2 Average
+                                    </h3>
+                                    <div class="summary-value" id="semester2Average" style="font-size:28px; font-weight:700;">--</div>
+                                </div>
+                            </div>
+
+                            <!-- Semester 2 Grades Table -->
+                            <div class="semester-card">
+                                <table class="grades-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th class="text-center">Coef.</th>
+                                            <th class="text-center">Exam</th>
+                                            <th class="text-center">TD</th>
+                                            <th class="text-center">TP</th>
+                                            <th class="text-center">Final</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="row : ${gradeRows}" th:if="${row.semester == 2}" th:attr="data-semester=${row.semester}, data-academicyear=${row.academicYear}">
+                                            <td>
+                                                <div class="subject-name" th:text="${row.subjectName}">Subject Name</div>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="coefficient-badge" th:text="${row.coefficient}">3</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span th:if="${row.examen != null}" 
+                                                      th:text="${#numbers.formatDecimal(row.examen, 1, 2)}"
+                                                      th:classappend="${row.examen >= 16 ? 'grade-excellent' : row.examen >= 14 ? 'grade-good' : row.examen >= 10 ? 'grade-average' : 'grade-poor'}"
+                                                      class="grade-value">15.00</span>
+                                                <span th:if="${row.examen == null}" class="grade-value grade-missing">-</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span th:if="${row.td != null}" 
+                                                      th:text="${#numbers.formatDecimal(row.td, 1, 2)}"
+                                                      th:classappend="${row.td >= 16 ? 'grade-excellent' : row.td >= 14 ? 'grade-good' : row.td >= 10 ? 'grade-average' : 'grade-poor'}"
+                                                      class="grade-value">12.00</span>
+                                                <span th:if="${row.td == null}" class="grade-value grade-missing">-</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span th:if="${row.tp != null}" 
+                                                      th:text="${#numbers.formatDecimal(row.tp, 1, 2)}"
+                                                      th:classappend="${row.tp >= 16 ? 'grade-excellent' : row.tp >= 14 ? 'grade-good' : row.tp >= 10 ? 'grade-average' : 'grade-poor'}"
+                                                      class="grade-value">14.00</span>
+                                                <span th:if="${row.tp == null}" class="grade-value grade-missing">-</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span th:if="${row.finalGrade != null}" 
+                                                      th:text="${#numbers.formatDecimal(row.finalGrade, 1, 2)}"
+                                                      th:classappend="${row.finalGrade >= 16 ? 'grade-excellent' : row.finalGrade >= 14 ? 'grade-good' : row.finalGrade >= 10 ? 'grade-average' : 'grade-poor'}"
+                                                      class="grade-value"
+                                                      th:attr="data-final=${row.finalGrade}, data-coef=${row.coefficient}">13.67</span>
+                                                <span th:if="${row.finalGrade == null}" class="grade-value grade-missing">-</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Sidebar - Academic Info -->
+                <aside class="right-sidebar">
+                    <!-- Academic Year Selector -->
+                    <div class="sidebar-card">
+                        <div class="sidebar-card-title">
+                            <i class="fas fa-calendar-alt me-2"></i>Academic Year
+                        </div>
+                        <select id="yearSelect" class="form-select form-select-lg mt-3" style="font-weight: 600; color: #1877f2; border: 2px solid #e4e6eb; font-size: 16px;">
+                            <option th:each="year : ${years}" 
+                                    th:value="${year}" 
+                                    th:text="${year}"
+                                    th:selected="${year == selectedYear}">2024-2025</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Semester Toggle -->
+                    <div class="sidebar-card">
+                        <div class="sidebar-card-title">
+                            <i class="fas fa-toggle-on me-2"></i>Select Semester
+                        </div>
+                        <div class="semester-toggle mt-3">
+                            <button class="semester-btn active" data-semester="1">
+                                <i class="fas fa-book"></i>
+                                <span>Semester 1</span>
+                            </button>
+                            <button class="semester-btn" data-semester="2">
+                                <i class="fas fa-book-open"></i>
+                                <span>Semester 2</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    
+                </aside>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const yearSelect = document.getElementById('yearSelect');
+            const displayYear = document.getElementById('displayYear');
+            const displaySemester = document.getElementById('displaySemester');
+            const semesterBtns = document.querySelectorAll('.semester-btn');
+            const semester1Section = document.getElementById('semester1');
+            const semester2Section = document.getElementById('semester2');
+            
+            let currentSemester = 1;
+
+            function getSelectedYear() {
+                return yearSelect ? yearSelect.value : '';
+            }
+            
+            function updateCurrentView() {
+                // Update year display
+                if (displayYear && yearSelect) {
+                    displayYear.textContent = yearSelect.value;
+                }
+                
+                // Update semester display
+                if (displaySemester) {
+                    displaySemester.textContent = 'Semester ' + currentSemester;
+                }
+            }
+            
+            function toggleSemester(semester) {
+                currentSemester = semester;
+                
+                // Update button states
+                semesterBtns.forEach(btn => {
+                    const btnSem = parseInt(btn.getAttribute('data-semester'));
+                    if (btnSem === semester) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+                
+                // Show/hide semester sections
+                if (semester === 1) {
+                    semester1Section.style.display = 'block';
+                    semester2Section.style.display = 'none';
+                } else {
+                    semester1Section.style.display = 'none';
+                    semester2Section.style.display = 'block';
+                }
+                
+                updateCurrentView();
+                computeAverages();
+            }
+
+            function applyYearFilter() {
+                const selectedYear = getSelectedYear();
+                const rows = Array.from(document.querySelectorAll('tr[data-academicyear]'));
+                
+                rows.forEach(row => {
+                    const rowYear = row.getAttribute('data-academicyear') || '';
+                    const matchYear = !selectedYear || selectedYear === '' || rowYear === selectedYear;
+                    row.style.display = matchYear ? '' : 'none';
+                });
+
+                updateCurrentView();
+                computeAverages();
+            }
+
+            function computeAverages() {
+                // Semester 1
+                const sem1Rows = Array.from(document.querySelectorAll('#semester1 tr[data-semester="1"]'))
+                    .filter(row => row.style.display !== 'none');
+                computeSemesterAverage(sem1Rows, 'semester1Average');
+
+                // Semester 2
+                const sem2Rows = Array.from(document.querySelectorAll('#semester2 tr[data-semester="2"]'))
+                    .filter(row => row.style.display !== 'none');
+                computeSemesterAverage(sem2Rows, 'semester2Average');
+            }
+
+            function computeSemesterAverage(rows, targetId) {
+                let totalWeighted = 0, totalCoef = 0;
+
+                rows.forEach(row => {
+                    const finalEl = row.querySelector('[data-final]');
+                    if (finalEl) {
+                        const finalGrade = parseFloat(finalEl.getAttribute('data-final'));
+                        const coef = parseFloat(finalEl.getAttribute('data-coef'));
+                        if (!isNaN(finalGrade) && !isNaN(coef)) {
+                            totalWeighted += finalGrade * coef;
+                            totalCoef += coef;
+                        }
+                    }
+                });
+
+                const targetEl = document.getElementById(targetId);
+                if (targetCoef > 0) {
+                    const avg = totalWeighted / totalCoef;
+                    targetEl.textContent = avg.toFixed(2);
+                    targetEl.className = 'summary-value';
+                    if (avg >= 16) targetEl.classList.add('excellent');
+                    else if (avg >= 14) targetEl.classList.add('good');
+                    else if (avg >= 10) targetEl.classList.add('average');
+                    else targetEl.classList.add('poor');
+                } else {
+                    targetEl.textContent = '--';
+                    targetEl.className = 'summary-value';
+                }
+            }
+
+            // Wire up year filter
+            if (yearSelect) {
+                yearSelect.addEventListener('change', applyYearFilter);
+            }
+            
+            // Wire up semester toggle buttons
+            semesterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const semester = parseInt(this.getAttribute('data-semester'));
+                    toggleSemester(semester);
+                });
+            });
+
+            // Initialize
+            applyYearFilter();
+            toggleSemester(1); // Start with semester 1
+        });
+    </script>
+</body>
+</html>
