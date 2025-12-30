@@ -73,9 +73,9 @@ public class WebController {
     public String dashboard(Authentication authentication) {
         if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_STUDENT"))) {
             return "redirect:/student/dashboard";
-        } else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_TEACHER"))) {
-            return "redirect:/teacher/dashboard";
         } else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_HEAD_OF_DEPARTMENT"))) {
+            return "redirect:/hod/dashboard";
+        } else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_TEACHER"))) {
             return "redirect:/teacher/dashboard";
         } else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
             return "redirect:/admin/dashboard";
@@ -264,15 +264,39 @@ public class WebController {
         model.addAttribute("user", currentUser);
         model.addAttribute("teacher", teacher);
         model.addAttribute("departments", departmentRepository.findAll());
-        model.addAttribute("classes", classRepository.findAll());
         
-        // Get groups from teacher's department
-        List<Group> departmentGroups = groupRepository.findAll().stream()
-                .filter(g -> g.getStudentClass() != null && 
-                            g.getStudentClass().getDepartment() != null &&
-                            g.getStudentClass().getDepartment().getId().equals(teacher.getDepartment().getId()))
+        // Get classes the teacher teaches (from their assignments)
+        List<TeacherAssignment> teacherAssignments = teacherAssignmentRepository.findByTeacherId(teacher.getId());
+        
+        // Get unique class IDs from assignments
+        Set<Long> classIds = teacherAssignments.stream()
+                .map(ta -> ta.getStudentClass().getId())
+                .collect(Collectors.toSet());
+        
+        // Filter classes to only those the teacher teaches
+        List<StudentClass> teacherClasses = classRepository.findAll().stream()
+                .filter(c -> classIds.contains(c.getId()))
                 .toList();
-        model.addAttribute("groups", departmentGroups);
+        model.addAttribute("classes", teacherClasses);
+        
+        // Get groups the teacher actually teaches (from their assignments)
+        Set<Long> groupIds = teacherAssignments.stream()
+                .filter(ta -> ta.getGroup() != null)
+                .map(ta -> ta.getGroup().getId())
+                .collect(Collectors.toSet());
+        
+        // If teacher has assignments without specific groups, include all groups from those classes
+        Set<Long> classIdsWithoutGroupFilter = teacherAssignments.stream()
+                .filter(ta -> ta.getGroup() == null)
+                .map(ta -> ta.getStudentClass().getId())
+                .collect(Collectors.toSet());
+        
+        List<Group> teacherGroups = groupRepository.findAll().stream()
+                .filter(g -> g.getStudentClass() != null && 
+                            (groupIds.contains(g.getId()) || 
+                             classIdsWithoutGroupFilter.contains(g.getStudentClass().getId())))
+                .toList();
+        model.addAttribute("groups", teacherGroups);
         
         // Add pending count for HoD
         if (currentUser.getRole() == Role.HEAD_OF_DEPARTMENT) {
@@ -385,5 +409,87 @@ public class WebController {
         model.addAttribute("user", currentUser);
 
         return "admin/manage";
+    }
+    
+    // ========== HEAD OF DEPARTMENT ROUTES ==========
+    
+    @GetMapping("/hod/dashboard")
+    public String hodDashboard(Authentication authentication, Model model) {
+        User currentUser = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        Teacher teacher = teacherRepository.findAll().stream()
+                .filter(t -> t.getUser().getId().equals(currentUser.getId()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Teacher profile not found"));
+        
+        // Find the department where this teacher is HOD
+        Department department = departmentRepository.findAll().stream()
+                .filter(d -> d.getHeadOfDepartment() != null && 
+                            d.getHeadOfDepartment().getId().equals(teacher.getId()))
+                .findFirst()
+                .orElse(null);
+        
+        if (department == null) {
+            // If not actually HOD, redirect to teacher dashboard
+            return "redirect:/teacher/dashboard";
+        }
+        
+        model.addAttribute("user", currentUser);
+        model.addAttribute("teacher", teacher);
+        model.addAttribute("department", department);
+        model.addAttribute("posts", postService.getVisiblePostsForTeacher(teacher.getId()));
+        
+        // Add department-specific statistics
+        long studentCount = studentRepository.findAll().stream()
+                .filter(s -> s.getDepartment() != null && s.getDepartment().getId().equals(department.getId()))
+                .count();
+        long teacherCount = teacherRepository.findAll().stream()
+                .filter(t -> t.getDepartment() != null && t.getDepartment().getId().equals(department.getId()))
+                .count();
+        long classCount = classRepository.findAll().stream()
+                .filter(c -> c.getDepartment() != null && c.getDepartment().getId().equals(department.getId()))
+                .count();
+        long groupCount = groupRepository.findAll().stream()
+                .filter(g -> g.getStudentClass() != null && g.getStudentClass().getDepartment() != null && 
+                            g.getStudentClass().getDepartment().getId().equals(department.getId()))
+                .count();
+        
+        model.addAttribute("studentCount", studentCount);
+        model.addAttribute("teacherCount", teacherCount);
+        model.addAttribute("classCount", classCount);
+        model.addAttribute("groupCount", groupCount);
+        
+        return "hod/dashboard";
+    }
+    
+    @GetMapping("/hod/manage")
+    public String hodManage(Authentication authentication, Model model) {
+        User currentUser = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        Teacher teacher = teacherRepository.findAll().stream()
+                .filter(t -> t.getUser().getId().equals(currentUser.getId()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Teacher profile not found"));
+        
+        // Find the department where this teacher is HOD
+        Department department = departmentRepository.findAll().stream()
+                .filter(d -> d.getHeadOfDepartment() != null && 
+                            d.getHeadOfDepartment().getId().equals(teacher.getId()))
+                .findFirst()
+                .orElse(null);
+        
+        if (department == null) {
+            // If not actually HOD, redirect to teacher dashboard
+            return "redirect:/teacher/dashboard";
+        }
+        
+        model.addAttribute("user", currentUser);
+        model.addAttribute("teacher", teacher);
+        model.addAttribute("department", department);
+        model.addAttribute("departmentId", department.getId());
+
+        return "hod/manage";
     }
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Management - Faculty LMS</title>
+    <title>Department Management - Faculty LMS</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -69,9 +69,9 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
-            <a class="navbar-brand" href="/admin/dashboard"><i class="fas fa-user-shield"></i> Faculty LMS</a>
+            <a class="navbar-brand" href="/hod/dashboard"><i class="fas fa-user-tie"></i> Faculty LMS</a>
             <div class="d-flex">
-                <a href="/admin/dashboard" class="btn-back">
+                <a href="/hod/dashboard" class="btn-back">
                     <i class="fas fa-arrow-left"></i> Back to Dashboard
                 </a>
             </div>
@@ -81,19 +81,14 @@
     <div class="main-container">
         <div class="container">
             <div class="page-header">
-                <h1><i class="fas fa-cogs" style="color: #a435f0;"></i> System Management</h1>
-                <p style="color: #6a6f73; font-size: 16px; margin: 0;">Manage all system entities</p>
+                <h1><i class="fas fa-cogs" style="color: #a435f0;"></i> Department Management</h1>
+                <p style="color: #6a6f73; font-size: 16px; margin: 0;" th:text="${'Managing: ' + (department != null ? department.name : 'Department')}">Manage department entities</p>
             </div>
             
             <div class="section">
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" data-bs-toggle="tab" href="#departments">
-                            <i class="fas fa-building"></i> Departments
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#classes">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#classes">
                             <i class="fas fa-graduation-cap"></i> Classes
                         </a>
                     </li>
@@ -120,37 +115,8 @@
                 </ul>
                 
                 <div class="tab-content">
-                    <!-- Departments Tab -->
-                    <div class="tab-pane fade show active" id="departments">
-                        <div class="section-title">
-                            <span><i class="fas fa-building" style="color: #a435f0;"></i> Departments</span>
-                            <button class="btn-add" onclick="showAddDepartmentModal()">
-                                <i class="fas fa-plus"></i> Add Department
-                            </button>
-                        </div>
-                        <div class="search-box">
-                            <input type="text" id="deptSearch" placeholder="🔍 Search departments..." onkeyup="filterTable('deptSearch', 'departmentsTable')">
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th onclick="sortTable('departmentsTable', 0)">Code <i class="fas fa-sort"></i></th>
-                                        <th onclick="sortTable('departmentsTable', 1)">Name <i class="fas fa-sort"></i></th>
-                                        <th onclick="sortTable('departmentsTable', 2)">Description <i class="fas fa-sort"></i></th>
-                                        <th onclick="sortTable('departmentsTable', 3)">Head of Department <i class="fas fa-sort"></i></th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="departmentsTable">
-                                    <tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
                     <!-- Classes Tab -->
-                    <div class="tab-pane fade" id="classes">
+                    <div class="tab-pane fade show active" id="classes">
                         <div class="section-title">
                             <span><i class="fas fa-graduation-cap" style="color: #a435f0;"></i> Classes</span>
                             <button class="btn-add" onclick="showAddClassModal()">
@@ -345,10 +311,13 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <script th:inline="javascript">
         let currentData = { departments: [], classes: [], subjects: [], groups: [], students: [], teachers: [] };
         let pendingImportResult = null;
         let importType = null; // 'student' or 'teacher'
+        const HOD_DEPARTMENT_ID = /*[[${departmentId}]]*/ null; // Department ID from server
+        
+        console.log('HOD Department ID loaded:', HOD_DEPARTMENT_ID);
         
         document.addEventListener('DOMContentLoaded', function() {
             loadAllData();
@@ -356,7 +325,6 @@
         
         async function loadAllData() {
             await Promise.all([
-                loadDepartments(),
                 loadClasses(),
                 loadSubjects(),
                 loadGroups(),
@@ -404,38 +372,26 @@
             rows.forEach(row => table.appendChild(row));
         }
         
+        // HOD doesn't need to load all departments - only manages their own
         async function loadDepartments() {
-            try {
-                const response = await fetch('/api/departments', { credentials: 'include' });
-                currentData.departments = await response.json();
-                
-                const tbody = document.getElementById('departmentsTable');
-                if (currentData.departments.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-building"></i><h3>No departments yet</h3></td></tr>';
-                } else {
-                    tbody.innerHTML = currentData.departments.map(dept => `
-                        <tr>
-                            <td>${dept.code}</td>
-                            <td><strong>${dept.name}</strong></td>
-                            <td>${dept.description || '-'}</td>
-                            <td>${dept.headOfDepartmentName || 'Not Assigned'}</td>
-                            <td>
-                                <button class="btn-sm-action btn-edit" onclick="editDepartment(${dept.id})">
-                                    <i class="fas fa-edit"></i> Edit
-                                </button>
-                            </td>
-                        </tr>
-                    `).join('');
-                }
-            } catch (error) {
-                console.error('Error loading departments:', error);
-            }
+            // No-op for HOD page
+            currentData.departments = [];
         }
         
         async function loadClasses() {
             try {
                 const response = await fetch('/api/classes', { credentials: 'include' });
-                currentData.classes = await response.json();
+                const allClasses = await response.json();
+                
+                console.log('HOD_DEPARTMENT_ID:', HOD_DEPARTMENT_ID);
+                console.log('All classes:', allClasses.length);
+                
+                // Filter classes by HOD's department
+                currentData.classes = HOD_DEPARTMENT_ID ? 
+                    allClasses.filter(cls => cls.department && cls.department.id == HOD_DEPARTMENT_ID) : 
+                    allClasses;
+                
+                console.log('Filtered classes:', currentData.classes.length);
                 
                 const tbody = document.getElementById('classesTable');
                 if (currentData.classes.length === 0) {
@@ -491,7 +447,23 @@
         async function loadGroups() {
             try {
                 const response = await fetch('/api/groups', { credentials: 'include' });
-                currentData.groups = await response.json();
+                const allGroups = await response.json();
+                
+                console.log('All groups fetched:', allGroups.length);
+                console.log('Sample group:', allGroups[0]);
+                
+                // Filter groups by HOD's department (via class)
+                currentData.groups = HOD_DEPARTMENT_ID ? 
+                    allGroups.filter(grp => {
+                        const hasClass = grp.studentClass;
+                        const hasDept = hasClass && grp.studentClass.department;
+                        const matchesDept = hasDept && grp.studentClass.department.id == HOD_DEPARTMENT_ID;
+                        console.log(`Group ${grp.name}: hasClass=${hasClass}, hasDept=${hasDept}, matchesDept=${matchesDept}`);
+                        return matchesDept;
+                    }) : 
+                    allGroups;
+                
+                console.log('Filtered groups:', currentData.groups.length);
                 
                 const tbody = document.getElementById('groupsTable');
                 if (currentData.groups.length === 0) {
@@ -518,7 +490,12 @@
         async function loadStudents() {
             try {
                 const response = await fetch('/api/students', { credentials: 'include' });
-                currentData.students = await response.json();
+                const allStudents = await response.json();
+                
+                // Filter students by HOD's department
+                currentData.students = HOD_DEPARTMENT_ID ? 
+                    allStudents.filter(s => s.department && s.department.id == HOD_DEPARTMENT_ID) : 
+                    allStudents;
                 
                 const tbody = document.getElementById('studentsTable');
                 if (currentData.students.length === 0) {
@@ -548,7 +525,12 @@
         async function loadTeachers() {
             try {
                 const response = await fetch('/api/teachers', { credentials: 'include' });
-                currentData.teachers = await response.json();
+                const allTeachers = await response.json();
+                
+                // Filter teachers by HOD's department
+                currentData.teachers = HOD_DEPARTMENT_ID ? 
+                    allTeachers.filter(t => t.departmentId && t.departmentId == HOD_DEPARTMENT_ID) : 
+                    allTeachers;
                 
                 const tbody = document.getElementById('teachersTable');
                 if (currentData.teachers.length === 0) {
@@ -663,13 +645,8 @@
                                         <label class="form-label">Academic Year</label>
                                         <input type="text" class="form-control" id="classYear" placeholder="e.g., 2024-2025">
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Department</label>
-                                        <select class="form-select" id="classDeptId" required>
-                                            <option value="">Select Department</option>
-                                            ${deptOptions}
-                                        </select>
-                                    </div>
+                                    <!-- Hidden department field - auto-set to HOD's department -->
+                                    <input type="hidden" id="classDeptId">
                                     
                                     <div class="mb-3">
                                         <label class="form-label">Assign Subjects</label>
@@ -752,17 +729,13 @@
                                         <label class="form-label">Capacity</label>
                                         <input type="number" class="form-control" id="groupCapacity" value="30">
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Department</label>
-                                        <select class="form-select" id="groupDeptId" onchange="filterGroupClasses()" required>
-                                            <option value="">Select Department</option>
-                                            ${deptOptions}
-                                        </select>
-                                    </div>
+                                    <!-- Hidden department field - auto-set to HOD's department -->
+                                    <input type="hidden" id="groupDeptId">
                                     <div class="mb-3">
                                         <label class="form-label">Class</label>
                                         <select class="form-select" id="groupClassId" required>
-                                            <option value="">Select Department first</option>
+                                            <option value="">Select Class</option>
+                                            ${classOptions}
                                         </select>
                                     </div>
                                     <button type="submit" class="btn-add w-100"><i class="fas fa-save"></i> Save Group</button>
@@ -813,20 +786,16 @@
                                         <small style="color: #6a6f73;">Leave blank when editing to keep current password</small>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-4 mb-3">
-                                            <label class="form-label">Department</label>
-                                            <select class="form-select" id="studentDeptId" onchange="filterStudentClasses()" required>
-                                                <option value="">Select Department</option>
-                                                ${deptOptions}
-                                            </select>
-                                        </div>
-                                        <div class="col-md-4 mb-3">
+                                        <!-- Hidden department field - auto-set to HOD's department -->
+                                        <input type="hidden" id="studentDeptId">
+                                        <div class="col-md-6 mb-3">
                                             <label class="form-label">Class</label>
                                             <select class="form-select" id="studentClassId" onchange="filterStudentGroups()" required>
-                                                <option value="">Select Department first</option>
+                                                <option value="">Select Class</option>
+                                                ${classOptions}
                                             </select>
                                         </div>
-                                        <div class="col-md-4 mb-3">
+                                        <div class="col-md-6 mb-3">
                                             <label class="form-label">Group</label>
                                             <select class="form-select" id="studentGroupId">
                                                 <option value="">Select Class first</option>
@@ -874,13 +843,8 @@
                                         <input type="password" class="form-control" id="teacherPassword" required>
                                         <small style="color: #6a6f73;">Leave blank when editing to keep current password</small>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Department</label>
-                                        <select class="form-select" id="teacherDeptId" required>
-                                            <option value="">Select Department</option>
-                                            ${deptOptions}
-                                        </select>
-                                    </div>
+                                    <!-- Hidden department field - auto-set to HOD's department -->
+                                    <input type="hidden" id="teacherDeptId">
                                     <div class="mb-3">
                                         <label class="form-label">Specialization</label>
                                         <input type="text" class="form-control" id="teacherSpecialization">
@@ -949,6 +913,8 @@
             document.getElementById('classModalTitle').textContent = 'Add Class';
             document.getElementById('classForm').reset();
             document.getElementById('classId').value = '';
+            // Auto-set department to HOD's department
+            document.getElementById('classDeptId').value = HOD_DEPARTMENT_ID || '';
             populateClassSubjects(null);
             new bootstrap.Modal(document.getElementById('classModal')).show();
         }
@@ -964,26 +930,20 @@
             document.getElementById('groupModalTitle').textContent = 'Add Group';
             document.getElementById('groupForm').reset();
             document.getElementById('groupId').value = '';
-            // Reset class dropdown to initial state
-            document.getElementById('groupClassId').innerHTML = '<option value="">Select Department first</option>';
+            // Auto-set department to HOD's department
+            document.getElementById('groupDeptId').value = HOD_DEPARTMENT_ID || '';
+            // Populate classes (already filtered by department in currentData.classes)
+            const classSelect = document.getElementById('groupClassId');
+            classSelect.innerHTML = '<option value="">Select Class</option>' + 
+                currentData.classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
             new bootstrap.Modal(document.getElementById('groupModal')).show();
         }
         
         function filterGroupClasses() {
-            const deptId = document.getElementById('groupDeptId').value;
+            // Not needed for HOD - classes are already filtered
             const classSelect = document.getElementById('groupClassId');
-            
-            if (!deptId) {
-                classSelect.innerHTML = '<option value="">Select Department first</option>';
-                return;
-            }
-            
-            const filteredClasses = currentData.classes.filter(c => 
-                c.department && c.department.id == deptId
-            );
-            
             classSelect.innerHTML = '<option value="">Select Class</option>' + 
-                filteredClasses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                currentData.classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
         }
         
         function showAddStudentModal() {
@@ -991,31 +951,21 @@
             document.getElementById('studentForm').reset();
             document.getElementById('studentDbId').value = '';
             document.getElementById('studentPassword').required = true;
-            // Reset dropdowns to initial state
-            document.getElementById('studentClassId').innerHTML = '<option value="">Select Department first</option>';
+            // Auto-set department to HOD's department
+            document.getElementById('studentDeptId').value = HOD_DEPARTMENT_ID || '';
+            // Populate classes (already filtered by department in currentData.classes)
+            const classSelect = document.getElementById('studentClassId');
+            classSelect.innerHTML = '<option value="">Select Class</option>' + 
+                currentData.classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
             document.getElementById('studentGroupId').innerHTML = '<option value="">Select Class first</option>';
             new bootstrap.Modal(document.getElementById('studentModal')).show();
         }
         
         function filterStudentClasses() {
-            const deptId = document.getElementById('studentDeptId').value;
+            // Not needed for HOD - classes are already filtered
             const classSelect = document.getElementById('studentClassId');
-            const groupSelect = document.getElementById('studentGroupId');
-            
-            // Reset class and group dropdowns
-            groupSelect.innerHTML = '<option value="">Select Class first</option>';
-            
-            if (!deptId) {
-                classSelect.innerHTML = '<option value="">Select Department first</option>';
-                return;
-            }
-            
-            const filteredClasses = currentData.classes.filter(c => 
-                c.department && c.department.id == deptId
-            );
-            
             classSelect.innerHTML = '<option value="">Select Class</option>' + 
-                filteredClasses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                currentData.classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
         }
         
         function filterStudentGroups() {
@@ -1040,6 +990,8 @@
             document.getElementById('teacherForm').reset();
             document.getElementById('teacherDbId').value = '';
             document.getElementById('teacherPassword').required = true;
+            // Auto-set department to HOD's department
+            document.getElementById('teacherDeptId').value = HOD_DEPARTMENT_ID || '';
             new bootstrap.Modal(document.getElementById('teacherModal')).show();
         }
         
@@ -1066,7 +1018,8 @@
             document.getElementById('className').value = cls.name;
             document.getElementById('classLevel').value = cls.level || '';
             document.getElementById('classYear').value = cls.academicYear || '';
-            document.getElementById('classDeptId').value = cls.department ? cls.department.id : '';
+            // Auto-set department to HOD's department
+            document.getElementById('classDeptId').value = HOD_DEPARTMENT_ID || (cls.department ? cls.department.id : '');
             
             populateClassSubjects(cls.id);
             new bootstrap.Modal(document.getElementById('classModal')).show();
@@ -1156,13 +1109,15 @@
             document.getElementById('groupName').value = grp.name;
             document.getElementById('groupCapacity').value = grp.capacity || 30;
             
-            // Set department and filter classes
-            const classObj = grp.studentClass ? currentData.classes.find(c => c.id === grp.studentClass.id) : null;
-            if (classObj && classObj.department) {
-                document.getElementById('groupDeptId').value = classObj.department.id;
-                filterGroupClasses();
-            }
+            // Auto-set department to HOD's department
+            document.getElementById('groupDeptId').value = HOD_DEPARTMENT_ID || '';
             
+            // Populate classes dropdown (already filtered by department)
+            const classSelect = document.getElementById('groupClassId');
+            classSelect.innerHTML = '<option value="">Select Class</option>' + 
+                currentData.classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            
+            // Select the group's class
             document.getElementById('groupClassId').value = grp.studentClass ? grp.studentClass.id : '';
             
             new bootstrap.Modal(document.getElementById('groupModal')).show();
@@ -1181,10 +1136,14 @@
             document.getElementById('studentEmail').value = student.user.email;
             document.getElementById('studentPassword').value = '';
             document.getElementById('studentPassword').required = false;
-            document.getElementById('studentDeptId').value = student.department ? student.department.id : '';
             
-            // Filter and set class based on department
-            filterStudentClasses();
+            // Auto-set department to HOD's department
+            document.getElementById('studentDeptId').value = HOD_DEPARTMENT_ID || '';
+            
+            // Populate classes dropdown (already filtered by department)
+            const classSelect = document.getElementById('studentClassId');
+            classSelect.innerHTML = '<option value="">Select Class</option>' + 
+                currentData.classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
             document.getElementById('studentClassId').value = student.studentClass ? student.studentClass.id : '';
             
             // Filter and set group based on class
@@ -1206,7 +1165,8 @@
             document.getElementById('teacherUsername').value = teacher.username;
             document.getElementById('teacherPassword').value = '';
             document.getElementById('teacherPassword').required = false;
-            document.getElementById('teacherDeptId').value = teacher.departmentId || '';
+            // Auto-set department to HOD's department
+            document.getElementById('teacherDeptId').value = HOD_DEPARTMENT_ID || '';
             document.getElementById('teacherSpecialization').value = teacher.specialization || '';
             document.getElementById('teacherOffice').value = teacher.officeLocation || '';
             
@@ -1564,11 +1524,20 @@
             event.preventDefault();
             
             const id = document.getElementById('groupId').value;
+            const classId = document.getElementById('groupClassId').value;
+            
+            if (!classId) {
+                alert('Please select a class');
+                return;
+            }
+            
             const data = {
                 name: document.getElementById('groupName').value,
-                capacity: document.getElementById('groupCapacity').value,
-                classId: document.getElementById('groupClassId').value
+                capacity: parseInt(document.getElementById('groupCapacity').value) || 30,
+                classId: parseInt(classId)
             };
+            
+            console.log('Saving group with data:', data);
             
             const method = id ? 'PUT' : 'POST';
             const url = id ? `/api/groups/${id}` : '/api/groups';
@@ -1585,9 +1554,12 @@
                     bootstrap.Modal.getInstance(document.getElementById('groupModal')).hide();
                     await loadAllData();
                 } else {
-                    alert('Failed to save group: ' + await response.text());
+                    const errorText = await response.text();
+                    console.error('Failed to save group:', errorText);
+                    alert('Failed to save group: ' + errorText);
                 }
             } catch (error) {
+                console.error('Error saving group:', error);
                 alert('Error: ' + error.message);
             }
         }

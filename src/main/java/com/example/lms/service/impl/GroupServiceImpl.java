@@ -44,6 +44,12 @@ public class GroupServiceImpl implements GroupService {
         StudentClass studentClass = classRepository.findById(groupDTO.getClassId())
                 .orElseThrow(() -> new RuntimeException("Class not found with id: " + groupDTO.getClassId()));
         
+        // Check for duplicate group name in the same class
+        groupRepository.findByNameAndStudentClassId(groupDTO.getName(), groupDTO.getClassId())
+                .ifPresent(existingGroup -> {
+                    throw new RuntimeException("A group with name '" + groupDTO.getName() + "' already exists in this class");
+                });
+        
         Group group = new Group();
         group.setName(groupDTO.getName());
         group.setCapacity(groupDTO.getCapacity() != null ? groupDTO.getCapacity() : 30);
@@ -55,7 +61,15 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group updateGroup(Long id, GroupDTO groupDTO) {
         return groupRepository.findById(id).map(group -> {
-            if (groupDTO.getName() != null) {
+            if (groupDTO.getName() != null && !groupDTO.getName().equals(group.getName())) {
+                // Check for duplicate only if name is changing
+                Long classId = groupDTO.getClassId() != null ? groupDTO.getClassId() : group.getStudentClass().getId();
+                groupRepository.findByNameAndStudentClassId(groupDTO.getName(), classId)
+                        .ifPresent(existingGroup -> {
+                            if (!existingGroup.getId().equals(id)) {
+                                throw new RuntimeException("A group with name '" + groupDTO.getName() + "' already exists in this class");
+                            }
+                        });
                 group.setName(groupDTO.getName());
             }
             if (groupDTO.getCapacity() != null) {

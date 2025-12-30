@@ -38,14 +38,14 @@ public class DepartmentController {
     }
 
     @PostMapping
-    public DepartmentDTO createDepartment(@RequestBody Department department) {
-        return toDTO(departmentService.createDepartment(department));
+    public DepartmentDTO createDepartment(@RequestBody DepartmentDTO departmentDTO) {
+        return toDTO(departmentService.createDepartment(departmentDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DepartmentDTO> updateDepartment(@PathVariable Long id, @RequestBody Department department) {
+    public ResponseEntity<DepartmentDTO> updateDepartment(@PathVariable Long id, @RequestBody DepartmentDTO departmentDTO) {
         try {
-            return ResponseEntity.ok(toDTO(departmentService.updateDepartment(id, department)));
+            return ResponseEntity.ok(toDTO(departmentService.updateDepartment(id, departmentDTO)));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }

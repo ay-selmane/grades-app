@@ -21,7 +21,7 @@ public class Group {
 
     @ManyToOne
     @JoinColumn(name = "class_id", nullable = false)
-    @JsonIgnoreProperties({"department", "hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private StudentClass studentClass;
 
     @Column(nullable = false)
