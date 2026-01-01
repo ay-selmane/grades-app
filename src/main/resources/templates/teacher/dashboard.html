@@ -1050,11 +1050,11 @@
                         </div>
                         <div class="stats-item" th:if="${user.role.name() != 'HEAD_OF_DEPARTMENT'}">
                             <span class="stats-label">Approved</span>
-                            <span class="stats-value" th:text="${posts.stream().filter(p -> p.status.name() == 'APPROVED').count()}">0</span>
+                            <span class="stats-value" th:text="${posts.stream().filter(p -> p.status.name().equals('APPROVED')).count()}">0</span>
                         </div>
                         <div class="stats-item" th:if="${user.role.name() != 'HEAD_OF_DEPARTMENT'}">
                             <span class="stats-label">Pending</span>
-                            <span class="stats-value" th:text="${posts.stream().filter(p -> p.status.name() == 'PENDING_APPROVAL').count()}">0</span>
+                            <span class="stats-value" th:text="${posts.stream().filter(p -> p.status.name().equals('PENDING_APPROVAL')).count()}">0</span>
                         </div>
                         <div class="stats-item">
                             <span class="stats-label">Department</span>

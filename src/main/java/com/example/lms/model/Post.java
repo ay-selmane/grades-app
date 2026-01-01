@@ -36,6 +36,21 @@ public class Post {
     @Column(nullable = false)
     private PostVisibility visibility;
     
+    /**
+     * Whether this post is urgent and requires immediate attention.
+     * Urgent posts trigger notifications to all targeted users.
+     */
+    @Column(nullable = false)
+    private boolean urgent = false;
+    
+    /**
+     * Category of the post for classification and filtering.
+     * Defaults to GENERAL if not specified.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PostCategory category = PostCategory.GENERAL;
+    
     // Targeting options
     @ManyToOne
     @JoinColumn(name = "target_department_id")

@@ -4,6 +4,7 @@ import com.example.lms.dto.GradeDTO;
 import com.example.lms.model.*;
 import com.example.lms.repository.*;
 import com.example.lms.service.GradeService;
+import com.example.lms.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,12 +23,14 @@ public class GradeServiceImpl implements GradeService {
     private final UserRepository userRepository;
     private final ClassSubjectRepository classSubjectRepository;
     private final TeacherAssignmentRepository teacherAssignmentRepository;
+    private final NotificationService notificationService;
 
     @Autowired
     public GradeServiceImpl(GradeRepository gradeRepository, StudentRepository studentRepository,
                              SubjectRepository subjectRepository, StudentClassRepository classRepository,
                              UserRepository userRepository, ClassSubjectRepository classSubjectRepository,
-                             TeacherAssignmentRepository teacherAssignmentRepository) {
+                             TeacherAssignmentRepository teacherAssignmentRepository,
+                             NotificationService notificationService) {
         this.gradeRepository = gradeRepository;
         this.studentRepository = studentRepository;
         this.subjectRepository = subjectRepository;
@@ -35,6 +38,7 @@ public class GradeServiceImpl implements GradeService {
         this.userRepository = userRepository;
         this.classSubjectRepository = classSubjectRepository;
         this.teacherAssignmentRepository = teacherAssignmentRepository;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -81,7 +85,33 @@ public class GradeServiceImpl implements GradeService {
         grade.setEnteredAt(LocalDateTime.now());
         grade.setUpdatedAt(LocalDateTime.now());
         
-        return gradeRepository.save(grade);
+        Grade savedGrade = gradeRepository.save(grade);
+        
+        // 🔔 Send notification to student about new grade
+        try {
+            Student student = savedGrade.getStudent();
+            Subject subject = savedGrade.getSubject();
+            if (student != null && student.getUser() != null && subject != null) {
+                String message = String.format("New grade published for %s: %.2f/20", 
+                    subject.getName(), savedGrade.getFinalGrade());
+                String url = "/grades"; // URL to grades page
+                
+                notificationService.createNotification(
+                    student.getUser(),
+                    NotificationType.GRADE_PUBLISHED,
+                    "Grade Published",
+                    message,
+                    "Grade",
+                    savedGrade.getId(),
+                    url
+                );
+            }
+        } catch (Exception e) {
+            // Log error but don't fail the grade creation
+            System.err.println("Failed to create grade notification: " + e.getMessage());
+        }
+        
+        return savedGrade;
     }
 
     @Override
@@ -102,7 +132,32 @@ public class GradeServiceImpl implements GradeService {
             
             grade.setUpdatedAt(LocalDateTime.now());
             
-            return gradeRepository.save(grade);
+            Grade updatedGrade = gradeRepository.save(grade);
+            
+            // 🔔 Send notification to student about updated grade
+            try {
+                Student student = updatedGrade.getStudent();
+                Subject subject = updatedGrade.getSubject();
+                if (student != null && student.getUser() != null && subject != null) {
+                    String message = String.format("Grade updated for %s: %.2f/20", 
+                        subject.getName(), updatedGrade.getFinalGrade());
+                    String url = "/grades";
+                    
+                    notificationService.createNotification(
+                        student.getUser(),
+                        NotificationType.GRADE_PUBLISHED,
+                        "Grade Updated",
+                        message,
+                        "Grade",
+                        updatedGrade.getId(),
+                        url
+                    );
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to create grade update notification: " + e.getMessage());
+            }
+            
+            return updatedGrade;
         }).orElseThrow(() -> new RuntimeException("Grade not found"));
     }
 

@@ -4,6 +4,7 @@ import com.example.lms.dto.PostAttachmentDTO;
 import com.example.lms.dto.PostDTO;
 import com.example.lms.model.*;
 import com.example.lms.repository.*;
+import com.example.lms.service.NotificationService;
 import com.example.lms.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,6 +59,9 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     private GroupRepository groupRepository;
+    
+    @Autowired
+    private NotificationService notificationService;
 
     @Value("${file.upload-dir:uploads}")
     private String uploadDir;
@@ -108,6 +112,12 @@ public class PostServiceImpl implements PostService {
         }
 
         Post savedPost = postRepository.save(post);
+        
+        // 🔔 Send notifications if post was auto-approved
+        if (savedPost.getStatus() == PostStatus.APPROVED) {
+            sendPostNotifications(savedPost);
+        }
+        
         return convertToDTO(savedPost);
     }
     
@@ -287,7 +297,84 @@ public class PostServiceImpl implements PostService {
         post.setRejectionReason(null); // Clear any previous rejection reason
 
         Post approvedPost = postRepository.save(post);
+        
+        // 🔔 Send notifications for approved post
+        sendPostNotifications(approvedPost);
+        
         return convertToDTO(approvedPost);
+    }
+    
+    /**
+     * Send notifications to all target users for an approved post
+     * Extracted to be reusable from both createPost (auto-approve) and approvePost
+     */
+    private void sendPostNotifications(Post post) {
+        try {
+            System.out.println("🔔 Preparing to send notifications for post...");
+            System.out.println("   Post ID: " + post.getId());
+            System.out.println("   Post Title: " + post.getTitle());
+            System.out.println("   Visibility: " + post.getVisibility());
+            System.out.println("   Target Department: " + (post.getTargetDepartment() != null ? post.getTargetDepartment().getName() : "null"));
+            System.out.println("   Target Class: " + (post.getTargetClass() != null ? post.getTargetClass().getName() : "null"));
+            System.out.println("   Target Group: " + (post.getTargetGroup() != null ? post.getTargetGroup().getName() : "null"));
+            
+            List<User> targetUsers = getTargetUsersForPost(post);
+            System.out.println("   📊 Found " + targetUsers.size() + " target users");
+            
+            if (!targetUsers.isEmpty()) {
+                String message = post.getTitle();
+                String url = "/feed"; // URL to feed/posts page
+                
+                System.out.println("   ✉️ Creating notifications for " + targetUsers.size() + " users...");
+                
+                notificationService.createNotificationsForUsers(
+                    targetUsers,
+                    NotificationType.URGENT_POST, // Using URGENT_POST for all feed notifications
+                    "New Post",
+                    message,
+                    "Post",
+                    post.getId(),
+                    url
+                );
+                
+                System.out.println("   ✅ Sent notifications to " + targetUsers.size() + " users for post: " + post.getTitle());
+            } else {
+                System.out.println("   ⚠️ No target users found for this post!");
+            }
+        } catch (Exception e) {
+            System.err.println("   ❌ Failed to create post notification: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Helper method to get all users who should receive notifications for a post
+     */
+    private List<User> getTargetUsersForPost(Post post) {
+        List<User> users = new ArrayList<>();
+        
+        // Based on visibility and targeting
+        if (post.getTargetGroup() != null) {
+            // Get all students in the group
+            List<Student> students = studentRepository.findByGroupId(post.getTargetGroup().getId());
+            students.forEach(student -> {
+                if (student.getUser() != null) users.add(student.getUser());
+            });
+        } else if (post.getTargetClass() != null) {
+            // Get all students in the class
+            List<Student> students = studentRepository.findByStudentClassId(post.getTargetClass().getId());
+            students.forEach(student -> {
+                if (student.getUser() != null) users.add(student.getUser());
+            });
+        } else if (post.getTargetDepartment() != null) {
+            // Get all students in the department
+            List<Student> students = studentRepository.findByDepartmentId(post.getTargetDepartment().getId());
+            students.forEach(student -> {
+                if (student.getUser() != null) users.add(student.getUser());
+            });
+        }
+        
+        return users;
     }
 
     @Override

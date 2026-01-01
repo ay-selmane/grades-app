@@ -643,7 +643,7 @@
                                 <label for="vis-class" class="visibility-label">
                                     <i class="fas fa-school"></i>
                                     <strong>Entire Class</strong>
-                                    <small>All students in a class</small>
+                                    <small>All groups (requires HoD approval)</small>
                                 </label>
                             </div>
                             <div class="visibility-option">
@@ -651,7 +651,7 @@
                                 <label for="vis-dept" class="visibility-label">
                                     <i class="fas fa-building"></i>
                                     <strong>Whole Department</strong>
-                                    <small>All department students</small>
+                                    <small>All students (requires HoD approval)</small>
                                 </label>
                             </div>
                         </div>
@@ -682,10 +682,10 @@
                             <!-- Class Selection -->
                             <div id="classField" style="display: none;">
                                 <h4><i class="fas fa-school"></i> Select Class</h4>
+                                <p style="color: #6a6f73; font-size: 14px; margin-bottom: 12px;">Select a class you teach (requires HoD approval)</p>
                                 <select class="form-select" id="targetClassId" name="targetClassId">
                                     <option value="">Choose class...</option>
                                     <option th:each="cls : ${classes}" 
-                                            th:if="${cls.department.id == teacher.department.id}"
                                             th:value="${cls.id}" 
                                             th:text="${cls.name}"></option>
                                 </select>
