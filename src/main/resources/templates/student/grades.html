@@ -125,6 +125,34 @@
             text-align: center;
         }
         
+        /* Notification Badge Styles */
+        .notification-badge {
+            display: none;
+            background: #ff4458;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: auto;
+            min-width: 18px;
+            text-align: center;
+            line-height: 1.4;
+        }
+        
+        .nav-item .notification-badge {
+            display: none;
+        }
+        
+        @keyframes badge-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .badge-pulse {
+            animation: badge-pulse 0.5s ease-in-out;
+        }
+        
         .main-content {
             flex: 1;
             min-width: 0;
@@ -559,10 +587,12 @@
                         <a href="/student/dashboard" class="nav-item">
                             <i class="fas fa-stream"></i>
                             <span>My Feed</span>
+                            <span id="feed-badge" class="notification-badge"></span>
                         </a>
                         <a href="#" class="nav-item">
                             <i class="fas fa-calendar-alt"></i>
                             <span>Schedule</span>
+                            <span id="schedule-badge" class="notification-badge"></span>
                         </a>
                         <a href="#" class="nav-item">
                             <i class="fas fa-graduation-cap"></i>
@@ -571,6 +601,7 @@
                         <a href="/student/grades" class="nav-item active">
                             <i class="fas fa-chart-line"></i>
                             <span>Grades</span>
+                            <span id="grades-badge" class="notification-badge"></span>
                         </a>
                     </div>
                 </aside>
@@ -861,7 +892,7 @@
                 });
 
                 const targetEl = document.getElementById(targetId);
-                if (targetCoef > 0) {
+                if (totalCoef > 0) {
                     const avg = totalWeighted / totalCoef;
                     targetEl.textContent = avg.toFixed(2);
                     targetEl.className = 'summary-value';
@@ -893,5 +924,8 @@
             toggleSemester(1); // Start with semester 1
         });
     </script>
+    
+    <!-- Notification Badge System -->
+    <script src="/js/notifications.js"></script>
 </body>
 </html>

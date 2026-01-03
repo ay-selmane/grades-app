@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Post - Faculty LMS</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Create Post - Faculty LMS - v2</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -308,68 +311,355 @@
             background: rgba(255, 71, 87, 0.1);
         }
         
-        .visibility-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            margin-bottom: 24px;
+        /* Post Target Select Dropdown */
+        .post-target-select {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 15px;
+            font-weight: 500;
+            border: 2px solid #d1d7dc;
+            border-radius: 8px;
+            background: white;
+            color: #1c1d1f;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
         
-        .visibility-option {
+        .post-target-select:focus {
+            border-color: #a435f0;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(164, 53, 240, 0.1);
+        }
+        
+        .post-target-select:hover {
+            border-color: #a435f0;
+        }
+        
+        .post-target-select option {
+            padding: 12px;
+            font-size: 14px;
+        }
+        
+        /* Approval Notice */
+        .approval-notice {
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+            border-left: 4px solid #ffc107;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #856404;
+        }
+        
+        .approval-notice i {
+            font-size: 18px;
+            color: #ffc107;
+        }
+        
+        /* Auto-Publish Notice */
+        .auto-publish-notice {
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-left: 4px solid #28a745;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #155724;
+        }
+        
+        .auto-publish-notice i {
+            font-size: 18px;
+            color: #28a745;
+        }
+        
+        /* Target Selection Cards */
+        .target-selection-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .target-card {
+            background: white;
+            border: 2px solid #d1d7dc;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .target-card:hover {
+            border-color: #a435f0;
+            box-shadow: 0 4px 16px rgba(164, 53, 240, 0.1);
+        }
+        
+        .target-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        
+        .target-card-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1c1d1f;
+        }
+        
+        .target-card-title i {
+            font-size: 24px;
+            color: #a435f0;
+        }
+        
+        .target-card-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .badge-auto-publish {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+        }
+        
+        .badge-needs-approval {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+            color: #856404;
+        }
+        
+        .target-card-description {
+            color: #6a6f73;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        
+        .target-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
+        }
+        
+        .target-option {
             position: relative;
         }
         
-        .visibility-option input[type="radio"] {
+        .target-option input {
             position: absolute;
             opacity: 0;
             width: 0;
             height: 0;
         }
         
-        .visibility-label {
+        .target-option-label {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            padding: 20px;
+            gap: 10px;
+            padding: 12px 16px;
             border: 2px solid #d1d7dc;
-            border-radius: 12px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
             background: white;
-            text-align: center;
+            font-weight: 600;
+            color: #2d2f31;
         }
         
-        .visibility-label:hover {
+        .target-option-label:hover {
             border-color: #a435f0;
             background: linear-gradient(135deg, #f7f4fd 0%, #f0ebf8 100%);
         }
         
-        .visibility-option input[type="radio"]:checked + .visibility-label {
+        .target-option input:checked + .target-option-label {
             border-color: #a435f0;
             background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
             color: white;
             box-shadow: 0 4px 12px rgba(164, 53, 240, 0.25);
         }
         
-        .visibility-label i {
-            font-size: 28px;
-            margin-bottom: 8px;
+        .target-option-label i {
             color: #a435f0;
         }
         
-        .visibility-option input[type="radio"]:checked + .visibility-label i {
+        .target-option input:checked + .target-option-label i {
             color: white;
         }
         
-        .visibility-label strong {
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 4px;
+        .single-target-option {
+            position: relative;
         }
         
-        .visibility-label small {
-            font-size: 12px;
-            opacity: 0.8;
+        .single-target-option input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .single-target-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 20px;
+            border: 2px solid #d1d7dc;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+            font-weight: 700;
+            color: #2d2f31;
+            font-size: 15px;
+            width: 100%;
+        }
+        
+        .single-target-button:hover {
+            border-color: #a435f0;
+            background: linear-gradient(135deg, #f7f4fd 0%, #f0ebf8 100%);
+            color: #a435f0;
+        }
+        
+        .single-target-button.selected {
+            border-color: #a435f0;
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(164, 53, 240, 0.25);
+        }
+        
+        .single-target-button i {
+            font-size: 18px;
+        }
+        
+        /* Selected targets display */
+        .selected-targets-display {
+            background: linear-gradient(135deg, #f7f9fa 0%, #ffffff 100%);
+            border: 2px dashed #d1d7dc;
+            border-radius: 12px;
+            padding: 16px;
+            min-height: 60px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .no-selection-message {
+            width: 100%;
+            text-align: center;
+            color: #6a6f73;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .no-selection-message i {
+            color: #a435f0;
+            font-size: 18px;
+        }
+        
+        .selected-target-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .selected-target-badge i {
+            font-size: 16px;
+        }
+        
+        .approval-indicator {
+            display: inline-flex;
+            align-items: center;
+            color: #ffd700;
+        }
+        
+        .auto-publish-indicator {
+            display: inline-flex;
+            align-items: center;
+            color: #90EE90;
+        }
+        
+        /* Button to open modal */
+        .btn-select-targets {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-select-targets:hover {
+            background: linear-gradient(135deg, #8710d8 0%, #6b0db5 100%);
+            box-shadow: 0 4px 12px rgba(164, 53, 240, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .btn-select-targets i {
+            font-size: 18px;
+        }
+        
+        /* Modal styling */
+        .modal-header {
+            border-bottom: 2px solid #f0f0f0;
+            padding: 20px 24px;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1c1d1f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal-title i {
+            color: #a435f0;
+            font-size: 24px;
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .modal-footer {
+            border-top: 2px solid #f0f0f0;
+            padding: 16px 24px;
+        }
+        
+        .modal-footer .btn-primary {
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            border: none;
+            padding: 10px 24px;
+            font-weight: 700;
+        }
+        
+        .modal-footer .btn-primary:hover {
+            background: linear-gradient(135deg, #8710d8 0%, #6b0db5 100%);
         }
         
         .target-selection {
@@ -545,28 +835,7 @@
         <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
             <div class="layout-wrapper">
                 <!-- Sidebar -->
-                <aside class="sidebar">
-                    <div class="sidebar-nav">
-                        <a href="/teacher/dashboard" class="nav-item">
-                            <i class="fas fa-stream"></i>
-                            <span th:if="${user != null && user.role.name() == 'HEAD_OF_DEPARTMENT'}">Department Feed</span>
-                            <span th:if="${user == null || user.role.name() != 'HEAD_OF_DEPARTMENT'}">My Feed</span>
-                        </a>
-                        <a href="/teacher/posts/new" class="nav-item active">
-                            <i class="fas fa-plus-circle"></i>
-                            <span>Create Post</span>
-                        </a>
-                        <div th:if="${user != null && user.role.name() == 'HEAD_OF_DEPARTMENT'}">
-                            <a href="/teacher/pending-approvals" class="nav-item">
-                                <i class="fas fa-tasks"></i>
-                                <span>Pending Approvals</span>
-                                <span th:if="${pendingCount != null && pendingCount > 0}" 
-                                      class="nav-badge" 
-                                      th:text="${pendingCount}">0</span>
-                            </a>
-                        </div>
-                    </div>
-                </aside>
+                <div th:replace="fragments/sidebar :: teacherSidebar('create-post')"></div>
                 
                 <!-- Main Content -->
                 <div class="main-content">
@@ -624,77 +893,35 @@
                         <div id="uploadedFilesList" class="uploaded-files-list"></div>
                     </div>
                     
-                    <!-- Visibility -->
+                    <!-- Post Target Selection -->
                     <div class="mb-4">
                         <label class="form-label">
-                            <i class="fas fa-eye"></i> Who can see this post? *
+                            <i class="fas fa-bullhorn"></i> Post to *
                         </label>
-                        <div class="visibility-options">
-                            <div class="visibility-option">
-                                <input type="radio" id="vis-group" name="visibility" value="GROUP" required onchange="updateTargetFields()" checked>
-                                <label for="vis-group" class="visibility-label">
-                                    <i class="fas fa-users"></i>
-                                    <strong>My Groups</strong>
-                                    <small>Select specific groups</small>
-                                </label>
-                            </div>
-                            <div class="visibility-option">
-                                <input type="radio" id="vis-class" name="visibility" value="CLASS" required onchange="updateTargetFields()">
-                                <label for="vis-class" class="visibility-label">
-                                    <i class="fas fa-school"></i>
-                                    <strong>Entire Class</strong>
-                                    <small>All students in a class</small>
-                                </label>
-                            </div>
-                            <div class="visibility-option">
-                                <input type="radio" id="vis-dept" name="visibility" value="DEPARTMENT" required onchange="updateTargetFields()">
-                                <label for="vis-dept" class="visibility-label">
-                                    <i class="fas fa-building"></i>
-                                    <strong>Whole Department</strong>
-                                    <small>All department students</small>
-                                </label>
+                        <p style="color: #6a6f73; font-size: 14px; margin-bottom: 12px;">
+                            Choose who will see this post
+                        </p>
+                        
+                        <!-- Selected Targets Display -->
+                        <div id="selectedTargetsDisplay" class="selected-targets-display">
+                            <div class="no-selection-message">
+                                <i class="fas fa-mouse-pointer"></i>
+                                <span>Click below to select your audience</span>
                             </div>
                         </div>
+                        
+                        <!-- Button to open modal -->
+                        <button type="button" class="btn-select-targets" data-bs-toggle="modal" data-bs-target="#targetSelectionModal">
+                            <i class="fas fa-users-cog"></i>
+                            Select Audience
+                        </button>
                     </div>
                     
-                    <!-- Target Selection (shown based on visibility) -->
-                    <div id="targetSelection">
-                        <div class="target-selection">
-                            <!-- Groups Selection (checkboxes) -->
-                            <div id="groupsField">
-                                <h4><i class="fas fa-users"></i> Select Groups</h4>
-                                <p style="color: #6a6f73; font-size: 14px; margin-bottom: 12px;">Choose which groups will receive this post</p>
-                                <div class="groups-checkbox-list">
-                                    <div th:each="grp : ${groups}" class="group-checkbox-item">
-                                        <input type="checkbox" 
-                                               th:id="'group-' + ${grp.id}" 
-                                               name="targetGroupIds" 
-                                               th:value="${grp.id}"
-                                               class="group-checkbox">
-                                        <label th:for="'group-' + ${grp.id}" class="group-checkbox-label">
-                                            <i class="fas fa-users"></i>
-                                            <span th:text="${grp.name + ' (' + grp.studentClass.name + ')'}">Group Name</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Class Selection -->
-                            <div id="classField" style="display: none;">
-                                <h4><i class="fas fa-school"></i> Select Class</h4>
-                                <select class="form-select" id="targetClassId" name="targetClassId">
-                                    <option value="">Choose class...</option>
-                                    <option th:each="cls : ${classes}" 
-                                            th:if="${cls.department.id == teacher.department.id}"
-                                            th:value="${cls.id}" 
-                                            th:text="${cls.name}"></option>
-                                </select>
-                            </div>
-                            
-                            <!-- Department (auto-filled, hidden) -->
-                            <input type="hidden" id="targetDepartmentId" name="targetDepartmentId" th:value="${teacher.department.id}">
-                        </div>
-                    </div>
+                    <!-- Hidden fields for form submission -->
+                    <input type="hidden" id="visibility" name="visibility">
+                    <input type="hidden" id="targetDepartmentId" name="targetDepartmentId">
+                    <input type="hidden" id="targetClassId" name="targetClassId">
+                    <input type="hidden" id="targetGroupIds" name="targetGroupIds">
                     
                     <!-- Buttons -->
                     <div class="d-flex gap-3 mt-5">
@@ -714,43 +941,288 @@
     </div>
     </div>
     
+    <!-- Target Selection Modal -->
+    <div class="modal fade" id="targetSelectionModal" tabindex="-1" aria-labelledby="targetSelectionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="targetSelectionModalLabel">
+                        <i class="fas fa-users-cog"></i> Select Your Audience
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p style="color: #666; margin-bottom: 24px;">
+                        Choose who will see this post. You can select multiple groups or choose a broader audience.
+                    </p>
+                    
+                    <!-- Target Selection Cards -->
+                    <div id="targetSelectionCards" class="target-selection-cards">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmTargetSelection()" data-bs-dismiss="modal">
+                        <i class="fas fa-check"></i> Confirm Selection
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
-    <script>
-        function updateTargetFields() {
-            const visibility = document.querySelector('input[name="visibility"]:checked')?.value;
-            const targetSelection = document.getElementById('targetSelection');
-            const groupsField = document.getElementById('groupsField');
-            const classField = document.getElementById('classField');
+    <!-- Quill Rich Text Editor JS -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    
+    <script th:inline="none">
+        // Load available post targets from API and build card UI
+        async function loadPostTargets() {
+            try {
+                const response = await fetch('/api/posts/targets');
+                const targets = await response.json();
+                
+                const container = document.getElementById('targetSelectionCards');
+                container.innerHTML = '';
+                
+                // Group targets by type
+                const groups = targets.filter(t => t.type === 'GROUP');
+                const classes = targets.filter(t => t.type === 'CLASS');
+                const departments = targets.filter(t => t.type === 'DEPARTMENT');
+                
+                // Create Groups Card (if any)
+                if (groups.length > 0) {
+                    const groupCard = createTargetCard(
+                        'My Groups',
+                        'users',
+                        'Students I directly teach - Select one or multiple groups',
+                        false,
+                        groups,
+                        true // multiple selection
+                    );
+                    container.appendChild(groupCard);
+                }
+                
+                // Create Classes Card (if any)
+                if (classes.length > 0) {
+                    const classCard = createTargetCard(
+                        'Entire Classes',
+                        'school',
+                        'All students in a class - Requires Head of Department approval',
+                        true,
+                        classes,
+                        false // single selection
+                    );
+                    container.appendChild(classCard);
+                }
+                
+                // Create Department Card (if any)
+                if (departments.length > 0) {
+                    const deptCard = createTargetCard(
+                        'Department',
+                        'building',
+                        departments[0].needsApproval ? 
+                            'All students in the department - Requires Head of Department approval' :
+                            'All students in the department - Publishes immediately',
+                        departments[0].needsApproval,
+                        departments,
+                        false // single selection
+                    );
+                    container.appendChild(deptCard);
+                }
+            } catch (error) {
+                console.error('Failed to load post targets:', error);
+                document.getElementById('targetSelectionCards').innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: #ff4757;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Failed to load post targets. Please refresh the page.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Create a target card
+        function createTargetCard(title, icon, description, needsApproval, options, isMultiple) {
+            const card = document.createElement('div');
+            card.className = 'target-card';
             
+            const badge = needsApproval ? 
+                '<span class="target-card-badge badge-needs-approval"><i class="fas fa-exclamation-circle"></i> Needs Approval</span>' :
+                '<span class="target-card-badge badge-auto-publish"><i class="fas fa-check-circle"></i> Auto-publish</span>';
+            
+            card.innerHTML = `
+                <div class="target-card-header">
+                    <div class="target-card-title">
+                        <i class="fas fa-${icon}"></i>
+                        <span>${title}</span>
+                    </div>
+                    ${badge}
+                </div>
+                <div class="target-card-description">${description}</div>
+                <div class="${isMultiple ? 'target-options' : 'single-target-option'}" id="options-${title.replace(/\s+/g, '-').toLowerCase()}">
+                    <!-- Options will be added here -->
+                </div>
+            `;
+            
+            const optionsContainer = card.querySelector(`#options-${title.replace(/\s+/g, '-').toLowerCase()}`);
+            
+            if (isMultiple) {
+                // Multiple selection (checkboxes)
+                options.forEach(option => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'target-option';
+                    optionDiv.innerHTML = `
+                        <input type="checkbox" 
+                               id="target-${option.type}-${option.id}" 
+                               name="target-${option.type}" 
+                               value="${option.id}"
+                               data-type="${option.type}"
+                               data-name="${option.name}">
+                        <label for="target-${option.type}-${option.id}" class="target-option-label">
+                            <i class="fas fa-users"></i>
+                            <span>${option.name}</span>
+                        </label>
+                    `;
+                    optionsContainer.appendChild(optionDiv);
+                });
+            } else {
+                // Single selection (buttons that can be toggled)
+                options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'single-target-button';
+                    button.setAttribute('data-type', option.type);
+                    button.setAttribute('data-id', option.id);
+                    button.setAttribute('data-name', option.name);
+                    button.setAttribute('data-needs-approval', option.needsApproval);
+                    button.innerHTML = `
+                        <i class="fas fa-${icon}"></i>
+                        <span>${option.name}</span>
+                    `;
+                    button.onclick = function() {
+                        toggleSingleSelection(this);
+                    };
+                    optionsContainer.appendChild(button);
+                });
+            }
+            
+            return card;
+        }
+        
+        // Toggle single selection (can select/deselect)
+        function toggleSingleSelection(button) {
+            const container = button.parentElement;
+            const wasSelected = button.classList.contains('selected');
+            
+            // Deselect all in this container
+            container.querySelectorAll('.single-target-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // If it wasn't selected, select it
+            if (!wasSelected) {
+                button.classList.add('selected');
+            }
+        }
+        
+        // Confirm target selection and update display
+        function confirmTargetSelection() {
+            const display = document.getElementById('selectedTargetsDisplay');
+            const selectedItems = [];
+            
+            // Get selected groups (checkboxes)
+            document.querySelectorAll('input[data-type="GROUP"]:checked').forEach(input => {
+                selectedItems.push({
+                    type: 'GROUP',
+                    id: input.value,
+                    name: input.getAttribute('data-name'),
+                    icon: 'users',
+                    needsApproval: false
+                });
+            });
+            
+            // Get selected class (button)
+            const selectedClass = document.querySelector('.single-target-button[data-type="CLASS"].selected');
+            if (selectedClass) {
+                selectedItems.push({
+                    type: 'CLASS',
+                    id: selectedClass.getAttribute('data-id'),
+                    name: selectedClass.getAttribute('data-name'),
+                    icon: 'school',
+                    needsApproval: selectedClass.getAttribute('data-needs-approval') === 'true'
+                });
+            }
+            
+            // Get selected department (button)
+            const selectedDept = document.querySelector('.single-target-button[data-type="DEPARTMENT"].selected');
+            if (selectedDept) {
+                selectedItems.push({
+                    type: 'DEPARTMENT',
+                    id: selectedDept.getAttribute('data-id'),
+                    name: selectedDept.getAttribute('data-name'),
+                    icon: 'building',
+                    needsApproval: selectedDept.getAttribute('data-needs-approval') === 'true'
+                });
+            }
+            
+            // Update display
+            if (selectedItems.length === 0) {
+                display.innerHTML = `
+                    <div class="no-selection-message">
+                        <i class="fas fa-mouse-pointer"></i>
+                        <span>Click below to select your audience</span>
+                    </div>
+                `;
+            } else {
+                display.innerHTML = selectedItems.map(item => `
+                    <div class="selected-target-badge">
+                        <i class="fas fa-${item.icon}"></i>
+                        <span>${item.name}</span>
+                        ${item.needsApproval ? 
+                            '<span class="approval-indicator" title="Needs approval"><i class="fas fa-exclamation-circle"></i></span>' :
+                            '<span class="auto-publish-indicator" title="Auto-publish"><i class="fas fa-check-circle"></i></span>'
+                        }
+                    </div>
+                `).join('');
+            }
+            
+            // Update hidden form fields
+            updateFormFields(selectedItems);
+        }
+        
+        // Update hidden form fields
+        function updateFormFields(selectedItems) {
             // Reset all fields
-            groupsField.style.display = 'none';
-            classField.style.display = 'none';
+            document.getElementById('visibility').value = '';
+            document.getElementById('targetGroupIds').value = '';
+            document.getElementById('targetClassId').value = '';
+            document.getElementById('targetDepartmentId').value = '';
             
-            // Clear required on class
-            document.getElementById('targetClassId').required = false;
+            if (selectedItems.length === 0) return;
             
-            // Clear all group checkboxes
-            document.querySelectorAll('.group-checkbox').forEach(cb => cb.checked = false);
+            const groups = selectedItems.filter(item => item.type === 'GROUP');
+            const classItem = selectedItems.find(item => item.type === 'CLASS');
+            const deptItem = selectedItems.find(item => item.type === 'DEPARTMENT');
             
-            // Show relevant fields based on visibility
-            targetSelection.style.display = 'block';
-            
-            if (visibility === 'GROUP') {
-                groupsField.style.display = 'block';
-            } else if (visibility === 'CLASS') {
-                classField.style.display = 'block';
-                document.getElementById('targetClassId').required = true;
-            } else if (visibility === 'DEPARTMENT') {
-                // Department is auto-filled, no fields to show
-                targetSelection.style.display = 'none';
+            // Priority: DEPARTMENT > CLASS > GROUP
+            if (deptItem) {
+                document.getElementById('visibility').value = 'DEPARTMENT';
+                document.getElementById('targetDepartmentId').value = deptItem.id;
+            } else if (classItem) {
+                document.getElementById('visibility').value = 'CLASS';
+                document.getElementById('targetClassId').value = classItem.id;
+            } else if (groups.length > 0) {
+                document.getElementById('visibility').value = 'GROUP';
+                document.getElementById('targetGroupIds').value = groups.map(g => g.id).join(',');
             }
         }
         
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            updateTargetFields();
+            // Load post targets
+            loadPostTargets();
             
             // Initialize Quill Rich Text Editor
             var quill = new Quill('#editor', {
@@ -1003,39 +1475,50 @@
                 return;
             }
             
+            // Validate target selection
+            const visibility = document.getElementById('visibility').value;
+            if (!visibility) {
+                alert('Please select who can see this post');
+                return;
+            }
+            
             document.getElementById('content').value = content;
             
             const formData = new FormData(event.target);
-            const visibility = formData.get('visibility');
             
             const data = {
                 title: formData.get('title'),
                 content: content,
-                visibility: visibility,
-                targetDepartmentId: formData.get('targetDepartmentId') || null
+                visibility: visibility
             };
             
-            // Handle different visibility types
+            // Add target IDs based on visibility type
             if (visibility === 'CLASS') {
-                data.targetClassId = formData.get('targetClassId') || null;
-            } else if (visibility === 'GROUP') {
-                // Get all checked group IDs
-                const checkedGroups = Array.from(document.querySelectorAll('.group-checkbox:checked'))
-                    .map(cb => cb.value);
-                
-                if (checkedGroups.length === 0) {
-                    alert('Please select at least one group');
-                    return;
+                const targetClassId = formData.get('targetClassId');
+                if (targetClassId) {
+                    data.targetClassId = targetClassId;
                 }
-                
-                // For now, we'll send to the first selected group
-                // TODO: Backend should support multiple groups
-                data.targetGroupId = checkedGroups[0];
+            } else if (visibility === 'GROUP') {
+                const targetGroupIds = formData.get('targetGroupIds');
+                if (targetGroupIds) {
+                    // Split comma-separated IDs and convert to array of numbers
+                    data.targetGroupIds = targetGroupIds.split(',').map(id => parseInt(id.trim()));
+                    
+                    // If only one group, also set targetGroupId for backwards compatibility
+                    if (data.targetGroupIds.length === 1) {
+                        data.targetGroupId = data.targetGroupIds[0];
+                    }
+                }
+            } else if (visibility === 'DEPARTMENT') {
+                const targetDepartmentId = formData.get('targetDepartmentId');
+                if (targetDepartmentId) {
+                    data.targetDepartmentId = targetDepartmentId;
+                }
             }
             
-            // Remove null values
+            // Remove null/undefined values
             Object.keys(data).forEach(key => {
-                if (data[key] === null || data[key] === '') {
+                if (data[key] === null || data[key] === undefined || data[key] === '') {
                     delete data[key];
                 }
             });
@@ -1057,7 +1540,12 @@
                         await uploadAttachments(post.id);
                     }
                     
-                    alert('Post created successfully as draft!');
+                    // Check if auto-approved or needs approval
+                    if (post.status === 'APPROVED') {
+                        alert('Post published successfully!');
+                    } else {
+                        alert('Post created successfully! It will be visible after approval by the Head of Department.');
+                    }
                     window.location.href = '/teacher/dashboard';
                 } else {
                     return response.text().then(text => {
@@ -1091,8 +1579,5 @@
             }
         }
     </script>
-    
-    <!-- Quill Rich Text Editor JS -->
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 </body>
 </html>

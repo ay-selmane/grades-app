@@ -5,8 +5,12 @@ import com.example.lms.model.Post;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PostService {
+    
+    // Post targets
+    List<Map<String, Object>> getPostTargetsForUser(Long userId);
     
     // Create and update
     PostDTO createPost(PostDTO postDTO, Long authorId);

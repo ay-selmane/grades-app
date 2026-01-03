@@ -65,6 +65,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/teachers/**").hasAnyRole("ADMIN", "HEAD_OF_DEPARTMENT")
                 .requestMatchers("/api/grades/**").authenticated()
                 .requestMatchers("/api/posts/**").authenticated()
+                .requestMatchers("/api/notifications/**").authenticated()
                 
                 // Web pages - role-based
                 .requestMatchers("/student/**").hasRole("STUDENT")
@@ -98,13 +99,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // SECURITY FIX: Don't allow all origins in production!
-        // For development, you can use specific origins like "http://localhost:3000"
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        // Allow requests from the same origin (localhost:8080) and common dev ports
+        configuration.setAllowedOrigins(Arrays.asList(
+            "http://localhost:8080",
+            "http://127.0.0.1:8080",
+            "http://localhost:3000"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
-        configuration.setAllowCredentials(true); // Required when not using "*"
+        configuration.setAllowCredentials(true);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

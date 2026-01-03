@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Common Styles Fragment -->
+    <style th:fragment="commonStyles">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: white !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            padding: 16px 0;
+            border-bottom: 1px solid #d1d7dc;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: #1c1d1f !important;
+            font-size: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .main-container {
+            padding: 32px 0;
+        }
+        
+        .layout-wrapper {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-nav {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #d1d7dc;
+            position: sticky;
+            top: 24px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 8px;
+            color: #2d2f31;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .nav-item:hover {
+            background: linear-gradient(135deg, #f7f4fd 0%, #f0ebf8 100%);
+            color: #8710d8;
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(164, 53, 240, 0.25);
+        }
+        
+        .nav-item i {
+            margin-right: 12px;
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .nav-badge {
+            margin-left: auto;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 12px;
+            padding: 2px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            min-width: 24px;
+            text-align: center;
+        }
+        
+        .main-content {
+            flex: 1;
+            min-width: 0;
+            max-width: 700px;
+        }
+        
+        .btn-logout {
+            background: #1c1d1f;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-logout:hover {
+            background: #000;
+            color: white;
+        }
+        
+        /* Right Sidebar Stats */
+        .right-sidebar {
+            width: 300px;
+            flex-shrink: 0;
+        }
+        
+        @media (max-width: 1200px) {
+            .right-sidebar {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                margin-bottom: 24px;
+            }
+            
+            .layout-wrapper {
+                flex-direction: column;
+            }
+            
+            .main-content {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+</html>

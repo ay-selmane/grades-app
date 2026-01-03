@@ -1,5 +1,6 @@
 package com.example.lms.dto;
 
+import com.example.lms.model.PostCategory;
 import com.example.lms.model.PostStatus;
 import com.example.lms.model.PostVisibility;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,8 @@ public class PostDTO {
     private String content;
     private PostStatus status;
     private PostVisibility visibility;
+    private boolean urgent;
+    private PostCategory category;
     
     // Targeting
     private Long targetDepartmentId;

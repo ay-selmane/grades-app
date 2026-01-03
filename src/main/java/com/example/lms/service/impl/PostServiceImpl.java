@@ -4,6 +4,7 @@ import com.example.lms.dto.PostAttachmentDTO;
 import com.example.lms.dto.PostDTO;
 import com.example.lms.model.*;
 import com.example.lms.repository.*;
+import com.example.lms.service.NotificationService;
 import com.example.lms.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,9 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,9 +57,118 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     private GroupRepository groupRepository;
+    
+    @Autowired
+    private NotificationService notificationService;
 
     @Value("${file.upload-dir:uploads}")
     private String uploadDir;
+
+    @Override
+    public List<Map<String, Object>> getPostTargetsForUser(Long userId) {
+        List<Map<String, Object>> targets = new ArrayList<>();
+        
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        Teacher teacher = teacherRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Teacher not found"));
+        
+        boolean isHoD = user.getRole() == Role.HEAD_OF_DEPARTMENT;
+        Department hodDepartment = isHoD ? teacher.getDepartment() : null;
+        
+        // Get teacher's assignments
+        List<TeacherAssignment> assignments = teacherAssignmentRepository.findByTeacherId(teacher.getId());
+        
+        // 1. Add groups the teacher directly teaches (always auto-approved)
+        Set<Long> addedGroupIds = new HashSet<>();
+        for (TeacherAssignment assignment : assignments) {
+            Group group = assignment.getGroup();
+            if (group != null && !addedGroupIds.contains(group.getId())) {
+                Map<String, Object> target = new HashMap<>();
+                target.put("type", "GROUP");
+                target.put("id", group.getId());
+                target.put("name", group.getName() + " (" + group.getStudentClass().getName() + ")");
+                target.put("needsApproval", false);
+                target.put("icon", "users");
+                targets.add(target);
+                addedGroupIds.add(group.getId());
+            }
+        }
+        
+        // 1b. If HoD, add ALL other groups in their department (auto-approved)
+        if (isHoD && hodDepartment != null) {
+            List<StudentClass> departmentClasses = studentClassRepository.findByDepartmentId(hodDepartment.getId());
+            for (StudentClass studentClass : departmentClasses) {
+                List<Group> classGroups = groupRepository.findByStudentClassId(studentClass.getId());
+                for (Group group : classGroups) {
+                    if (!addedGroupIds.contains(group.getId())) {
+                        Map<String, Object> target = new HashMap<>();
+                        target.put("type", "GROUP");
+                        target.put("id", group.getId());
+                        target.put("name", group.getName() + " (" + studentClass.getName() + ")");
+                        target.put("needsApproval", false);
+                        target.put("icon", "users");
+                        targets.add(target);
+                        addedGroupIds.add(group.getId());
+                    }
+                }
+            }
+        }
+        
+        // 2. Add classes where teacher teaches at least one group
+        Set<Long> addedClassIds = new HashSet<>();
+        for (TeacherAssignment assignment : assignments) {
+            StudentClass studentClass = assignment.getStudentClass();
+            if (studentClass != null && !addedClassIds.contains(studentClass.getId())) {
+                // HoD doesn't need approval for classes in their department
+                boolean needsApproval = true;
+                if (isHoD && hodDepartment != null && studentClass.getDepartment() != null 
+                    && studentClass.getDepartment().getId().equals(hodDepartment.getId())) {
+                    needsApproval = false;
+                }
+                
+                Map<String, Object> target = new HashMap<>();
+                target.put("type", "CLASS");
+                target.put("id", studentClass.getId());
+                target.put("name", studentClass.getName() + " (entire class)");
+                target.put("needsApproval", needsApproval);
+                target.put("icon", "school");
+                targets.add(target);
+                addedClassIds.add(studentClass.getId());
+            }
+        }
+        
+        // 2b. If HoD, add all other classes in their department (no approval needed)
+        if (isHoD && hodDepartment != null) {
+            List<StudentClass> departmentClasses = studentClassRepository.findByDepartmentId(hodDepartment.getId());
+            for (StudentClass studentClass : departmentClasses) {
+                if (!addedClassIds.contains(studentClass.getId())) {
+                    Map<String, Object> target = new HashMap<>();
+                    target.put("type", "CLASS");
+                    target.put("id", studentClass.getId());
+                    target.put("name", studentClass.getName() + " (entire class)");
+                    target.put("needsApproval", false);
+                    target.put("icon", "school");
+                    targets.add(target);
+                    addedClassIds.add(studentClass.getId());
+                }
+            }
+        }
+        
+        // 3. Add department (HoD auto-approves, regular teacher needs approval)
+        if (teacher.getDepartment() != null) {
+            Map<String, Object> target = new HashMap<>();
+            target.put("type", "DEPARTMENT");
+            target.put("id", teacher.getDepartment().getId());
+            target.put("name", teacher.getDepartment().getName() + " (whole department)");
+            target.put("needsApproval", !isHoD);
+            target.put("icon", "building");
+            targets.add(target);
+        }
+        
+        return targets;
+    }
 
     @Override
     public PostDTO createPost(PostDTO postDTO, Long authorId) {
@@ -94,20 +202,53 @@ public class PostServiceImpl implements PostService {
             post.setTargetGroup(group);
         }
 
-        // Check if teacher is posting to their own assigned group
-        boolean isTeacherOwnGroup = isTeacherAssignedToGroup(authorId, postDTO.getTargetGroupId());
+        // Determine if post needs approval
+        boolean needsApproval = true;
         
-        if (isTeacherOwnGroup) {
-            // Auto-approve if teacher posts to their assigned group
+        // Check if teacher is posting to their own assigned group
+        if (postDTO.getTargetGroupId() != null) {
+            boolean isTeacherOwnGroup = isTeacherAssignedToGroup(authorId, postDTO.getTargetGroupId());
+            if (isTeacherOwnGroup) {
+                needsApproval = false; // Teachers can post to their own groups
+            }
+        }
+        
+        // Check if HoD is posting to their department or any class in their department
+        if (author.getRole() == Role.HEAD_OF_DEPARTMENT) {
+            Teacher teacher = teacherRepository.findByUserId(authorId).orElse(null);
+            if (teacher != null && teacher.getDepartment() != null) {
+                // HoD can post to their department without approval
+                if (postDTO.getTargetDepartmentId() != null && 
+                    postDTO.getTargetDepartmentId().equals(teacher.getDepartment().getId())) {
+                    needsApproval = false;
+                }
+                // HoD can post to any class in their department without approval
+                if (postDTO.getTargetClassId() != null) {
+                    StudentClass targetClass = studentClassRepository.findById(postDTO.getTargetClassId()).orElse(null);
+                    if (targetClass != null && targetClass.getDepartment().getId().equals(teacher.getDepartment().getId())) {
+                        needsApproval = false;
+                    }
+                }
+            }
+        }
+        
+        if (!needsApproval) {
+            // Auto-approve
             post.setStatus(PostStatus.APPROVED);
             post.setApprovedBy(author);
             post.setPublishedAt(LocalDateTime.now());
         } else {
-            // Otherwise, set to pending approval
+            // Set to pending approval
             post.setStatus(PostStatus.PENDING_APPROVAL);
         }
 
         Post savedPost = postRepository.save(post);
+        
+        // 🔔 Send notifications if post was auto-approved
+        if (savedPost.getStatus() == PostStatus.APPROVED) {
+            sendPostNotifications(savedPost);
+        }
+        
         return convertToDTO(savedPost);
     }
     
@@ -250,13 +391,22 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<PostDTO> getAllDepartmentPosts(Long departmentId) {
-        // HoD sees all approved posts in their department
+        // HoD sees all approved posts in their department (department-wide, class, and group level)
         List<Post> posts = postRepository.findAll().stream()
                 .filter(post -> post.getStatus() == PostStatus.APPROVED)
                 .filter(post -> {
-                    // Check if post belongs to this department
+                    // Department-wide posts
                     if (post.getTargetDepartment() != null) {
                         return post.getTargetDepartment().getId().equals(departmentId);
+                    }
+                    // Class-level posts in this department
+                    if (post.getTargetClass() != null && post.getTargetClass().getDepartment() != null) {
+                        return post.getTargetClass().getDepartment().getId().equals(departmentId);
+                    }
+                    // Group-level posts in this department
+                    if (post.getTargetGroup() != null && post.getTargetGroup().getStudentClass() != null 
+                        && post.getTargetGroup().getStudentClass().getDepartment() != null) {
+                        return post.getTargetGroup().getStudentClass().getDepartment().getId().equals(departmentId);
                     }
                     return false;
                 })
@@ -287,7 +437,84 @@ public class PostServiceImpl implements PostService {
         post.setRejectionReason(null); // Clear any previous rejection reason
 
         Post approvedPost = postRepository.save(post);
+        
+        // 🔔 Send notifications for approved post
+        sendPostNotifications(approvedPost);
+        
         return convertToDTO(approvedPost);
+    }
+    
+    /**
+     * Send notifications to all target users for an approved post
+     * Extracted to be reusable from both createPost (auto-approve) and approvePost
+     */
+    private void sendPostNotifications(Post post) {
+        try {
+            System.out.println("🔔 Preparing to send notifications for post...");
+            System.out.println("   Post ID: " + post.getId());
+            System.out.println("   Post Title: " + post.getTitle());
+            System.out.println("   Visibility: " + post.getVisibility());
+            System.out.println("   Target Department: " + (post.getTargetDepartment() != null ? post.getTargetDepartment().getName() : "null"));
+            System.out.println("   Target Class: " + (post.getTargetClass() != null ? post.getTargetClass().getName() : "null"));
+            System.out.println("   Target Group: " + (post.getTargetGroup() != null ? post.getTargetGroup().getName() : "null"));
+            
+            List<User> targetUsers = getTargetUsersForPost(post);
+            System.out.println("   📊 Found " + targetUsers.size() + " target users");
+            
+            if (!targetUsers.isEmpty()) {
+                String message = post.getTitle();
+                String url = "/feed"; // URL to feed/posts page
+                
+                System.out.println("   ✉️ Creating notifications for " + targetUsers.size() + " users...");
+                
+                notificationService.createNotificationsForUsers(
+                    targetUsers,
+                    NotificationType.URGENT_POST, // Using URGENT_POST for all feed notifications
+                    "New Post",
+                    message,
+                    "Post",
+                    post.getId(),
+                    url
+                );
+                
+                System.out.println("   ✅ Sent notifications to " + targetUsers.size() + " users for post: " + post.getTitle());
+            } else {
+                System.out.println("   ⚠️ No target users found for this post!");
+            }
+        } catch (Exception e) {
+            System.err.println("   ❌ Failed to create post notification: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Helper method to get all users who should receive notifications for a post
+     */
+    private List<User> getTargetUsersForPost(Post post) {
+        List<User> users = new ArrayList<>();
+        
+        // Based on visibility and targeting
+        if (post.getTargetGroup() != null) {
+            // Get all students in the group
+            List<Student> students = studentRepository.findByGroupId(post.getTargetGroup().getId());
+            students.forEach(student -> {
+                if (student.getUser() != null) users.add(student.getUser());
+            });
+        } else if (post.getTargetClass() != null) {
+            // Get all students in the class
+            List<Student> students = studentRepository.findByStudentClassId(post.getTargetClass().getId());
+            students.forEach(student -> {
+                if (student.getUser() != null) users.add(student.getUser());
+            });
+        } else if (post.getTargetDepartment() != null) {
+            // Get all students in the department
+            List<Student> students = studentRepository.findByDepartmentId(post.getTargetDepartment().getId());
+            students.forEach(student -> {
+                if (student.getUser() != null) users.add(student.getUser());
+            });
+        }
+        
+        return users;
     }
 
     @Override

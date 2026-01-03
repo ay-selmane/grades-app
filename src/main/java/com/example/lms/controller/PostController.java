@@ -39,6 +39,22 @@ public class PostController {
     @Autowired
     private TeacherRepository teacherRepository;
 
+    // ========== POST TARGET SELECTION ==========
+    
+    /**
+     * Get available post targets for the current user
+     * Returns list of groups/classes/departments they can post to
+     */
+    @GetMapping("/targets")
+    @PreAuthorize("hasAnyRole('TEACHER', 'HEAD_OF_DEPARTMENT')")
+    public ResponseEntity<List<Map<String, Object>>> getPostTargets(Authentication authentication) {
+        User user = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        List<Map<String, Object>> targets = postService.getPostTargetsForUser(user.getId());
+        return ResponseEntity.ok(targets);
+    }
+
     // ========== STUDENT ENDPOINTS ==========
 
     /**

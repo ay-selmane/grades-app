@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Teacher/HoD Sidebar Fragment -->
+    <aside class="sidebar" th:fragment="teacherSidebar(activePage)">
+        <div class="sidebar-nav">
+            <a href="/teacher/dashboard" 
+               th:classappend="${activePage == 'dashboard'} ? 'active' : ''"
+               class="nav-item">
+                <i class="fas fa-stream"></i>
+                <span th:if="${user.role.name() == 'HEAD_OF_DEPARTMENT'}">Department Feed</span>
+                <span th:if="${user.role.name() != 'HEAD_OF_DEPARTMENT'}">My Feed</span>
+            </a>
+            
+            <a href="/teacher/posts/new" 
+               th:classappend="${activePage == 'create-post'} ? 'active' : ''"
+               class="nav-item">
+                <i class="fas fa-plus-circle"></i>
+                <span>Create Post</span>
+            </a>
+            
+            <a href="/teacher/grades" 
+               th:classappend="${activePage == 'grades'} ? 'active' : ''"
+               class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Manage Grades</span>
+            </a>
+            
+            <!-- HoD-only links -->
+            <div th:if="${user.role.name() == 'HEAD_OF_DEPARTMENT'}">
+                <a href="/teacher/pending-approvals" 
+                   th:classappend="${activePage == 'pending-approvals'} ? 'active' : ''"
+                   class="nav-item">
+                    <i class="fas fa-tasks"></i>
+                    <span>Pending Approvals</span>
+                    <span th:if="${pendingCount != null && pendingCount > 0}" 
+                          class="nav-badge" 
+                          th:text="${pendingCount}">0</span>
+                </a>
+                
+                <a href="/hod/manage" 
+                   th:classappend="${activePage == 'manage-department'} ? 'active' : ''"
+                   class="nav-item">
+                    <i class="fas fa-cogs"></i>
+                    <span>Manage Department</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+</body>
+</html>
