@@ -9,181 +9,11 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Common Styles -->
+    <div th:replace="fragments/styles :: commonStyles"></div>
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f0f2f5;
-            min-height: 100vh;
-        }
-        
-        .navbar {
-            background: white !important;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-            padding: 16px 0;
-            border-bottom: 1px solid #d1d7dc;
-        }
-        
-        .navbar-brand {
-            font-weight: 700;
-            color: #1c1d1f !important;
-            font-size: 20px;
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 14px;
-        }
-        
-        .main-container {
-            padding: 32px 0;
-        }
-        
-        .layout-wrapper {
-            display: flex;
-            gap: 24px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .sidebar {
-            width: 240px;
-            flex-shrink: 0;
-        }
-        
-        .sidebar-nav {
-            background: white;
-            border-radius: 8px;
-            padding: 8px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 24px;
-        }
-        
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            color: #1c1d1f;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            margin-bottom: 4px;
-            position: relative;
-        }
-        
-        .nav-item:hover {
-            background: #f7f9fa;
-            color: #a435f0;
-        }
-        
-        .nav-item.active {
-            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
-            color: white;
-        }
-        
-        .nav-item i {
-            font-size: 18px;
-            width: 20px;
-            text-align: center;
-        }
-        
-        .main-content {
-            flex: 1;
-            min-width: 0;
-            max-width: 900px;
-        }
-        
-        .right-sidebar {
-            width: 280px;
-            flex-shrink: 0;
-        }
-        
-        .sidebar-card {
-            background: white;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 24px;
-        }
-        
-        .sidebar-card-title {
-            font-size: 17px;
-            font-weight: 700;
-            color: #050505;
-            margin-bottom: 16px;
-        }
-        
-        /* Semester Toggle Buttons */
-        .semester-toggle {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .semester-btn {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            width: 100%;
-            padding: 14px 18px;
-            background: white;
-            border: 2px solid #e4e6eb;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            color: #1c1d1f;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .semester-btn i {
-            font-size: 18px;
-            color: #6a6f73;
-            transition: color 0.3s ease;
-        }
-        
-        .semester-btn:hover {
-            background: #f7f9fa;
-            border-color: #a435f0;
-            transform: translateX(4px);
-        }
-        
-        .semester-btn.active {
-            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
-            border-color: #a435f0;
-            color: white;
-            box-shadow: 0 4px 12px rgba(164, 53, 240, 0.3);
-        }
-        
-        .semester-btn.active i {
-            color: white;
-        }
-        
-        /* Assignment Cards */
+        /* Page-specific styles for grades */
         .assignment-card {
             background: white;
             border-radius: 8px;
@@ -250,7 +80,6 @@
             color: #a435f0;
         }
         
-        /* Empty State */
         .empty-state {
             background: white;
             border-radius: 8px;
@@ -272,18 +101,73 @@
             margin-bottom: 8px;
         }
         
-        @media (max-width: 1200px) {
-            .layout-wrapper {
-                flex-direction: column;
-            }
-            
-            .sidebar, .right-sidebar {
-                width: 100%;
-            }
-            
-            .sidebar-nav, .sidebar-card {
-                position: static;
-            }
+        /* Right Sidebar Specific */
+        .right-sidebar {
+            width: 300px;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #d1d7dc;
+            position: sticky;
+            top: 24px;
+        }
+        
+        .sidebar-card-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #050505;
+            margin-bottom: 16px;
+        }
+        
+        .semester-toggle {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .semester-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 14px 18px;
+            background: white;
+            border: 2px solid #e4e6eb;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1c1d1f;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .semester-btn i {
+            font-size: 18px;
+            color: #6a6f73;
+            transition: color 0.3s ease;
+        }
+        
+        .semester-btn:hover {
+            background: #f7f9fa;
+            border-color: #a435f0;
+            transform: translateX(4px);
+        }
+        
+        .semester-btn.active {
+            background: linear-gradient(135deg, #a435f0 0%, #8710d8 100%);
+            border-color: #a435f0;
+            color: white;
+            box-shadow: 0 4px 12px rgba(164, 53, 240, 0.3);
+        }
+        
+        .semester-btn.active i {
+            color: white;
         }
     </style>
 </head>
@@ -314,22 +198,7 @@
         <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
             <div class="layout-wrapper">
                 <!-- Left Sidebar -->
-                <aside class="sidebar">
-                    <div class="sidebar-nav">
-                        <a href="/teacher/dashboard" class="nav-item">
-                            <i class="fas fa-stream"></i>
-                            <span>My Feed</span>
-                        </a>
-                        <a href="/teacher/posts/new" class="nav-item">
-                            <i class="fas fa-plus-circle"></i>
-                            <span>Create Post</span>
-                        </a>
-                        <a href="/teacher/grades" class="nav-item active">
-                            <i class="fas fa-chart-line"></i>
-                            <span>Manage Grades</span>
-                        </a>
-                    </div>
-                </aside>
+                <div th:replace="fragments/sidebar :: teacherSidebar('grades')"></div>
                 
                 <!-- Main Content -->
                 <div class="main-content">

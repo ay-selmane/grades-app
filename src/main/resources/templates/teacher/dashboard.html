@@ -851,32 +851,7 @@
         <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
             <div class="layout-wrapper">
                 <!-- Left Sidebar -->
-                <aside class="sidebar">
-                    <div class="sidebar-nav">
-                        <a href="/teacher/dashboard" class="nav-item active">
-                            <i class="fas fa-stream"></i>
-                            <span th:if="${user.role.name() == 'HEAD_OF_DEPARTMENT'}">Department Feed</span>
-                            <span th:if="${user.role.name() != 'HEAD_OF_DEPARTMENT'}">My Feed</span>
-                        </a>
-                        <a href="/teacher/posts/new" class="nav-item">
-                            <i class="fas fa-plus-circle"></i>
-                            <span>Create Post</span>
-                        </a>
-                        <a href="/teacher/grades" class="nav-item">
-                            <i class="fas fa-chart-line"></i>
-                            <span>Manage Grades</span>
-                        </a>
-                        <div th:if="${user.role.name() == 'HEAD_OF_DEPARTMENT'}">
-                            <a href="/teacher/pending-approvals" class="nav-item">
-                                <i class="fas fa-tasks"></i>
-                                <span>Pending Approvals</span>
-                                <span th:if="${pendingCount != null && pendingCount > 0}" 
-                                      class="nav-badge" 
-                                      th:text="${pendingCount}">0</span>
-                            </a>
-                        </div>
-                    </div>
-                </aside>
+                <div th:replace="fragments/sidebar :: teacherSidebar('dashboard')"></div>
                 
                 <!-- Main Feed -->
                 <div class="main-content">

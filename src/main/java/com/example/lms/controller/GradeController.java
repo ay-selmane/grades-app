@@ -95,18 +95,19 @@ public class GradeController {
             System.out.println("   Student: " + existingGrade.getStudent().getUser().getFirstName() + " " + existingGrade.getStudent().getUser().getLastName());
             System.out.println("   Subject: " + existingGrade.getSubject().getName() + " (Semester " + existingGrade.getSemester() + ")");
             
-            // Check if user is teacher and has permission
+            // Check if user is teacher/HoD and has permission
             String username = authentication.getName();
             User currentUser = userRepository.findByUsername(username).orElseThrow();
             
-            if (currentUser.getRole().toString().equals("TEACHER")) {
+            if (currentUser.getRole().toString().equals("TEACHER") || currentUser.getRole().toString().equals("HEAD_OF_DEPARTMENT")) {
                 // Find teacher record for this user
                 Teacher teacher = teacherService.getAllTeachers().stream()
                     .filter(t -> t.getUser().getId().equals(currentUser.getId()))
                     .findFirst()
                     .orElseThrow(() -> new RuntimeException("Teacher not found"));
                 
-                // Check if teacher can grade this student for this subject
+                // Check if teacher/HoD can grade this student for this subject
+                // Even HoD must teach the group to enter grades
                 if (!gradeService.canTeacherGradeStudent(teacher.getId(), existingGrade.getStudent().getId(), existingGrade.getSubject().getId())) {
                     return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
                 }
