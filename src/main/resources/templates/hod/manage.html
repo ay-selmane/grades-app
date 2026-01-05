@@ -134,11 +134,12 @@
                                         <th onclick="sortTable('classesTable', 1)">Level <i class="fas fa-sort"></i></th>
                                         <th onclick="sortTable('classesTable', 2)">Department <i class="fas fa-sort"></i></th>
                                         <th onclick="sortTable('classesTable', 3)">Academic Year <i class="fas fa-sort"></i></th>
+                                        <th style="text-align: center;">Schedule</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="classesTable">
-                                    <tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
+                                    <tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -395,7 +396,7 @@
                 
                 const tbody = document.getElementById('classesTable');
                 if (currentData.classes.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-graduation-cap"></i><h3>No classes yet</h3></td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-graduation-cap"></i><h3>No classes yet</h3></td></tr>';
                 } else {
                     tbody.innerHTML = currentData.classes.map(cls => `
                         <tr>
@@ -403,9 +404,17 @@
                             <td><span class="badge-custom badge-class">${cls.level || '-'}</span></td>
                             <td><span class="badge-custom badge-department">${cls.department ? cls.department.name : '-'}</span></td>
                             <td>${cls.academicYear || '-'}</td>
+                            <td style="text-align: center;">
+                                ${cls.scheduleImagePath ? 
+                                    '<i class="fas fa-check-circle" style="color: #28a745;" title="Schedule uploaded"></i>' : 
+                                    '<i class="fas fa-times-circle" style="color: #dc3545;" title="No schedule"></i>'}
+                            </td>
                             <td>
-                                <button class="btn-sm-action btn-edit" onclick="editClass(${cls.id})">
+                                <button class="btn-sm-action btn-edit" onclick="editClass(${cls.id})" title="Edit class details & subjects">
                                     <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn-sm-action" style="background: #a435f0; margin-left: 5px;" onclick="openScheduleUpload(${cls.id}, '${cls.name}')" title="Upload/manage schedule image">
+                                    <i class="fas fa-calendar-alt"></i> Schedule
                                 </button>
                             </td>
                         </tr>
@@ -648,6 +657,10 @@
                                     <!-- Hidden department field - auto-set to HOD's department -->
                                     <input type="hidden" id="classDeptId">
                                     
+                                    <div class="alert alert-info" style="font-size: 14px;">
+                                        <i class="fas fa-info-circle"></i> <strong>Tip:</strong> Use the <strong>Schedule</strong> button in the classes table to upload/manage the class schedule image separately.
+                                    </div>
+                                    
                                     <div class="mb-3">
                                         <label class="form-label">Assign Subjects</label>
                                         <ul class="nav nav-tabs" role="tablist">
@@ -740,6 +753,40 @@
                                     </div>
                                     <button type="submit" class="btn-add w-100"><i class="fas fa-save"></i> Save Group</button>
                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Schedule Upload Modal (Separate & Simple) -->
+                <div class="modal fade" id="scheduleModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title"><i class="fas fa-calendar-alt"></i> Manage Schedule</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" id="scheduleClassId">
+                                <div class="mb-3">
+                                    <label class="form-label"><strong>Class:</strong> <span id="scheduleClassName"></span></label>
+                                </div>
+                                
+                                <!-- Current Schedule Preview -->
+                                <div class="mb-3" id="currentScheduleDisplay">
+                                    <!-- Will be populated dynamically -->
+                                </div>
+                                
+                                <!-- Upload New Schedule -->
+                                <div class="mb-3">
+                                    <label class="form-label">Upload New Schedule Image</label>
+                                    <input type="file" class="form-control" id="scheduleImageUpload" accept="image/*">
+                                    <small class="text-muted">Supported formats: JPG, PNG, PDF (images only)</small>
+                                </div>
+                                
+                                <button type="button" class="btn-add w-100" onclick="uploadScheduleFromModal()">
+                                    <i class="fas fa-upload"></i> Upload Schedule
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1420,6 +1467,131 @@
                     await loadAllData();
                 } else {
                     alert('Failed to save class: ' + await response.text());
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        async function uploadSchedule(classId, file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch(`/api/classes/${classId}/schedule`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    console.error('Failed to upload schedule');
+                }
+            } catch (error) {
+                console.error('Error uploading schedule:', error);
+            }
+        }
+        
+        async function deleteSchedule(classId) {
+            if (!confirm('Are you sure you want to delete the schedule?')) return;
+            
+            try {
+                const response = await fetch(`/api/classes/${classId}/schedule`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    document.getElementById('currentSchedulePreview').innerHTML = '<small class="text-muted">No schedule uploaded</small>';
+                    await loadAllData();
+                } else {
+                    alert('Failed to delete schedule');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        // New simplified schedule management functions
+        async function openScheduleUpload(classId, className) {
+            document.getElementById('scheduleClassId').value = classId;
+            document.getElementById('scheduleClassName').textContent = className;
+            document.getElementById('scheduleImageUpload').value = '';
+            
+            // Load current schedule if exists
+            const classData = currentData.classes.find(c => c.id === classId);
+            const display = document.getElementById('currentScheduleDisplay');
+            
+            if (classData && classData.scheduleImagePath) {
+                display.innerHTML = `
+                    <div class="alert alert-success">
+                        <strong><i class="fas fa-check-circle"></i> Current Schedule:</strong><br>
+                        <img src="/uploads/${classData.scheduleImagePath}" style="max-width: 100%; margin-top: 10px; border-radius: 8px; border: 2px solid #28a745;">
+                        <br>
+                        <button class="btn btn-sm btn-danger mt-2" onclick="deleteScheduleFromModal(${classId})">
+                            <i class="fas fa-trash"></i> Delete Schedule
+                        </button>
+                    </div>
+                `;
+            } else {
+                display.innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle"></i> No schedule uploaded yet for this class.
+                    </div>
+                `;
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('scheduleModal'));
+            modal.show();
+        }
+        
+        async function uploadScheduleFromModal() {
+            const classId = document.getElementById('scheduleClassId').value;
+            const fileInput = document.getElementById('scheduleImageUpload');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select an image file to upload');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch(`/api/classes/${classId}/schedule`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    alert('✅ Schedule uploaded successfully!');
+                    bootstrap.Modal.getInstance(document.getElementById('scheduleModal')).hide();
+                    await loadAllData(); // Refresh the table to show the checkmark
+                } else {
+                    alert('❌ Failed to upload schedule');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        async function deleteScheduleFromModal(classId) {
+            if (!confirm('Are you sure you want to delete this schedule?')) return;
+            
+            try {
+                const response = await fetch(`/api/classes/${classId}/schedule`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    alert('✅ Schedule deleted successfully!');
+                    bootstrap.Modal.getInstance(document.getElementById('scheduleModal')).hide();
+                    await loadAllData();
+                } else {
+                    alert('❌ Failed to delete schedule');
                 }
             } catch (error) {
                 alert('Error: ' + error.message);

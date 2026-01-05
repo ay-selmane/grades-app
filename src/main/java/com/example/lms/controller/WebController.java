@@ -199,6 +199,24 @@ public class WebController {
             return (year - 1) + "-" + year;
         }
     }
+    
+    @GetMapping("/student/schedule")
+    public String studentSchedule(Authentication authentication, Model model) {
+        User currentUser = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Student student = studentRepository.findAll().stream()
+                .filter(s -> s.getUser().getId().equals(currentUser.getId()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Student profile not found"));
+
+        model.addAttribute("user", currentUser);
+        model.addAttribute("studentClass", student.getStudentClass());
+        model.addAttribute("group", student.getGroup());
+        model.addAttribute("department", student.getDepartment());
+        
+        return "student/schedule";
+    }
 
     // ========== TEACHER ROUTES ==========
 
