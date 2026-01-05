@@ -6,6 +6,7 @@ import com.example.lms.service.ClassService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -51,5 +52,27 @@ public class ClassController {
     public ResponseEntity<Void> deleteClass(@PathVariable Long id) {
         classService.deleteClass(id);
         return ResponseEntity.ok().build();
+    }
+    
+    @PostMapping("/{id}/schedule")
+    public ResponseEntity<StudentClass> uploadSchedule(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            StudentClass updatedClass = classService.uploadScheduleImage(id, file);
+            return ResponseEntity.ok(updatedClass);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    
+    @DeleteMapping("/{id}/schedule")
+    public ResponseEntity<StudentClass> deleteSchedule(@PathVariable Long id) {
+        try {
+            StudentClass updatedClass = classService.deleteScheduleImage(id);
+            return ResponseEntity.ok(updatedClass);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

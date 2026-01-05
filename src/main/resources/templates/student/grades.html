@@ -589,7 +589,7 @@
                             <span>My Feed</span>
                             <span id="feed-badge" class="notification-badge"></span>
                         </a>
-                        <a href="#" class="nav-item">
+                        <a href="/student/schedule" class="nav-item">
                             <i class="fas fa-calendar-alt"></i>
                             <span>Schedule</span>
                             <span id="schedule-badge" class="notification-badge"></span>
@@ -837,13 +837,15 @@
                     }
                 });
                 
-                // Show/hide semester sections
-                if (semester === 1) {
-                    semester1Section.style.display = 'block';
-                    semester2Section.style.display = 'none';
-                } else {
-                    semester1Section.style.display = 'none';
-                    semester2Section.style.display = 'block';
+                // Show/hide semester sections (only if they exist)
+                if (semester1Section && semester2Section) {
+                    if (semester === 1) {
+                        semester1Section.style.display = 'block';
+                        semester2Section.style.display = 'none';
+                    } else {
+                        semester1Section.style.display = 'none';
+                        semester2Section.style.display = 'block';
+                    }
                 }
                 
                 updateCurrentView();
@@ -892,6 +894,9 @@
                 });
 
                 const targetEl = document.getElementById(targetId);
+                // Check if element exists (it won't exist when there are no grades)
+                if (!targetEl) return;
+                
                 if (totalCoef > 0) {
                     const avg = totalWeighted / totalCoef;
                     targetEl.textContent = avg.toFixed(2);

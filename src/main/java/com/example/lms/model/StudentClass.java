@@ -32,4 +32,7 @@ public class StudentClass {
 
     @Column(name = "academic_year", nullable = false)
     private String academicYear;
+    
+    @Column(name = "schedule_image_path")
+    private String scheduleImagePath;
 }
