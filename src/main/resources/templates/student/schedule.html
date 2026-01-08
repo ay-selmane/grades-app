@@ -13,6 +13,13 @@
     <div th:replace="fragments/styles :: commonStyles"></div>
     
     <style>
+        /* Schedule page - full width content */
+        .main-content {
+            flex: 1;
+            min-width: 0;
+            max-width: 100% !important;
+        }
+        
         .schedule-container {
             background: white;
             border-radius: 12px;
@@ -70,54 +77,14 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
-            <a class="navbar-brand" href="/student/dashboard">
-                <i class="fas fa-graduation-cap"></i> Faculty LMS
-            </a>
-            <div class="d-flex align-items-center gap-3 ms-auto">
-                <div class="user-info">
-                    <div class="user-avatar" th:text="${user.firstName.substring(0,1) + user.lastName.substring(0,1)}">AB</div>
-                    <div>
-                        <div style="font-weight: 600; font-size: 14px; color: #1c1d1f;" 
-                             th:text="${user.firstName + ' ' + user.lastName}">Student Name</div>
-                        <div style="font-size: 12px; color: #6a6f73;">Student</div>
-                    </div>
-                </div>
-                <form action="/logout" method="post" style="margin: 0;">
-                    <button type="submit" class="btn btn-sm btn-outline-dark">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </form>
-            </div>
-        </div>
-    </nav>
+    <div th:replace="fragments/navbar :: studentNavbar"></div>
 
     <!-- Main Container -->
     <div class="main-container">
         <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
             <div class="layout-wrapper">
                 <!-- Left Sidebar -->
-                <aside class="sidebar">
-                    <div class="sidebar-nav">
-                        <a href="/student/dashboard" class="nav-item">
-                            <i class="fas fa-stream"></i>
-                            <span>My Feed</span>
-                        </a>
-                        <a href="/student/schedule" class="nav-item active">
-                            <i class="fas fa-calendar-alt"></i>
-                            <span>Schedule</span>
-                        </a>
-                        <a href="#" class="nav-item">
-                            <i class="fas fa-graduation-cap"></i>
-                            <span>My Courses</span>
-                        </a>
-                        <a href="/student/grades" class="nav-item">
-                            <i class="fas fa-chart-line"></i>
-                            <span>Grades</span>
-                        </a>
-                    </div>
-                </aside>
+                <div th:replace="fragments/sidebar :: studentSidebar('schedule')"></div>
                 
                 <!-- Main Content -->
                 <div class="main-content">
@@ -144,29 +111,6 @@
                         </div>
                     </div>
                 </div>
-                
-                <!-- Right Sidebar Stats -->
-                <aside class="right-sidebar">
-                    <div class="sidebar-card">
-                        <div class="sidebar-card-title">
-                            <i class="fas fa-info-circle"></i> Student Info
-                        </div>
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <strong>Class:</strong>
-                                <span th:text="${studentClass != null ? studentClass.name : 'N/A'}">N/A</span>
-                            </div>
-                            <div class="info-item">
-                                <strong>Group:</strong>
-                                <span th:text="${group != null ? group.name : 'N/A'}">N/A</span>
-                            </div>
-                            <div class="info-item">
-                                <strong>Department:</strong>
-                                <span th:text="${department != null ? department.name : 'N/A'}">N/A</span>
-                            </div>
-                        </div>
-                    </div>
-                </aside>
             </div>
         </div>
     </div>

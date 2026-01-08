@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Common Styles -->
-    <div th:replace="fragments/styles :: commonStyles"></div>
+    <div th:replace="~{fragments/styles :: commonStyles}"></div>
     
     <style>
         /* Page-specific styles for grades */
@@ -198,7 +198,7 @@
         <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
             <div class="layout-wrapper">
                 <!-- Left Sidebar -->
-                <div th:replace="fragments/sidebar :: teacherSidebar('grades')"></div>
+                <div th:replace="~{fragments/sidebar :: teacherSidebar('grades')}"></div>
                 
                 <!-- Main Content -->
                 <div class="main-content">

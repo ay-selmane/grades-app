@@ -15,6 +15,7 @@
             min-height: 100vh;
         }
         
+        /* Navbar Styles */
         .navbar {
             background: white !important;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
@@ -26,6 +27,10 @@
             font-weight: 700;
             color: #1c1d1f !important;
             font-size: 20px;
+        }
+        
+        .navbar-brand i {
+            color: #a435f0;
         }
         
         .user-info {
@@ -47,6 +52,7 @@
             font-size: 14px;
         }
         
+        /* Main Container */
         .main-container {
             padding: 32px 0;
         }
@@ -117,12 +123,14 @@
             text-align: center;
         }
         
+        /* Main Content Area */
         .main-content {
             flex: 1;
             min-width: 0;
             max-width: 700px;
         }
         
+        /* Buttons */
         .btn-logout {
             background: #1c1d1f;
             color: white;
@@ -137,6 +145,8 @@
         .btn-logout:hover {
             background: #000;
             color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
         
         /* Right Sidebar Stats */
@@ -145,9 +155,122 @@
             flex-shrink: 0;
         }
         
+        .sidebar-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #d1d7dc;
+            margin-bottom: 16px;
+            position: sticky;
+            top: 24px;
+        }
+        
+        .sidebar-card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1c1d1f;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sidebar-card-title i {
+            color: #a435f0;
+        }
+        
+        .info-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 14px 16px;
+            background: linear-gradient(135deg, #f7f4fd 0%, #fafbfc 100%);
+            border-radius: 10px;
+            border: 1px solid #e8eaed;
+            transition: all 0.2s ease;
+        }
+        
+        .info-item:hover {
+            background: linear-gradient(135deg, #f0ebf8 0%, #f7f9fa 100%);
+            border-color: #d1d7dc;
+            transform: translateX(2px);
+        }
+        
+        .info-label {
+            color: #6a6f73;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .info-label i {
+            font-size: 11px;
+            color: #a435f0;
+        }
+        
+        .info-value {
+            color: #1c1d1f;
+            font-size: 15px;
+            font-weight: 700;
+            padding-left: 17px;
+        }
+        
+        .info-item strong {
+            color: #6a6f73;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .info-item span {
+            color: #1c1d1f;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        /* Notification Badge Styles */
+        .notification-badge {
+            display: none;
+            background: #ff4458;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: auto;
+            min-width: 18px;
+            text-align: center;
+            line-height: 1.4;
+        }
+        
+        .notification-badge.show {
+            display: inline-block;
+            animation: badge-pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes badge-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        /* Responsive Design */
         @media (max-width: 1200px) {
             .right-sidebar {
                 display: none;
+            }
+            
+            .main-content {
+                max-width: 100%;
             }
         }
         
@@ -157,12 +280,21 @@
                 margin-bottom: 24px;
             }
             
+            .sidebar-nav {
+                position: relative;
+                top: 0;
+            }
+            
             .layout-wrapper {
                 flex-direction: column;
             }
             
             .main-content {
                 max-width: 100%;
+            }
+            
+            .main-container {
+                padding: 16px 0;
             }
         }
     </style>
