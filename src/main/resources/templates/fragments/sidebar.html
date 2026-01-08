@@ -1,6 +1,39 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
+    <!-- Student Sidebar Fragment -->
+    <aside class="sidebar" th:fragment="studentSidebar(activePage)">
+        <div class="sidebar-nav">
+            <a href="/student/dashboard" 
+               th:classappend="${activePage == 'dashboard'} ? 'active' : ''"
+               class="nav-item">
+                <i class="fas fa-stream"></i>
+                <span>My Feed</span>
+            </a>
+            
+            <a href="/student/schedule" 
+               th:classappend="${activePage == 'schedule'} ? 'active' : ''"
+               class="nav-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Schedule</span>
+            </a>
+            
+            <a href="#" 
+               th:classappend="${activePage == 'courses'} ? 'active' : ''"
+               class="nav-item">
+                <i class="fas fa-graduation-cap"></i>
+                <span>My Courses</span>
+            </a>
+            
+            <a href="/student/grades" 
+               th:classappend="${activePage == 'grades'} ? 'active' : ''"
+               class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Grades</span>
+            </a>
+        </div>
+    </aside>
+
     <!-- Teacher/HoD Sidebar Fragment -->
     <aside class="sidebar" th:fragment="teacherSidebar(activePage)">
         <div class="sidebar-nav">

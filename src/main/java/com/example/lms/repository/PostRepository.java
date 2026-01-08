@@ -12,16 +12,22 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
     
-    // Find posts by author
-    List<Post> findByAuthorIdOrderByCreatedAtDesc(Long authorId);
+    // Find posts by author - Basic query with batch fetching enabled in properties
+    @Query("SELECT p FROM Post p " +
+           "WHERE p.author.id = :authorId " +
+           "ORDER BY p.createdAt DESC")
+    List<Post> findByAuthorIdOrderByCreatedAtDesc(@Param("authorId") Long authorId);
     
     // Find posts by status
     List<Post> findByStatusOrderByCreatedAtDesc(PostStatus status);
     
     // Find pending posts for approval (HOD view) - for specific department
-    @Query("SELECT p FROM Post p WHERE p.status = 'PENDING_APPROVAL' " +
-           "AND p.targetDepartment.id = :departmentId " +
-           "ORDER BY p.createdAt DESC")
+    @Query("SELECT DISTINCT p FROM Post p " +
+           "LEFT JOIN p.targetClass c " +
+           "WHERE p.status = 'PENDING_APPROVAL' AND (" +
+           "p.targetDepartment.id = :departmentId OR " +
+           "c.department.id = :departmentId" +
+           ") ORDER BY p.createdAt DESC")
     List<Post> findPendingPostsByDepartment(@Param("departmentId") Long departmentId);
     
     // Find visible posts for a student based on their department/class/group
@@ -42,4 +48,19 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     
     // Find all approved posts (for admin)
     List<Post> findByStatusOrderByPublishedAtDesc(PostStatus status);
+    
+    // Find all approved posts for a department (department-wide, class, and group level)
+    @Query("SELECT DISTINCT p FROM Post p " +
+           "LEFT JOIN p.targetDepartment d " +
+           "LEFT JOIN p.targetClass c " +
+           "LEFT JOIN c.department cd " +
+           "LEFT JOIN p.targetGroup g " +
+           "LEFT JOIN g.studentClass gc " +
+           "LEFT JOIN gc.department gd " +
+           "WHERE p.status = 'APPROVED' AND (" +
+           "d.id = :departmentId OR " +
+           "cd.id = :departmentId OR " +
+           "gd.id = :departmentId" +
+           ") ORDER BY p.createdAt DESC")
+    List<Post> findApprovedPostsByDepartment(@Param("departmentId") Long departmentId);
 }

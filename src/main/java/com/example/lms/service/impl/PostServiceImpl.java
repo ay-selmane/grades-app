@@ -28,7 +28,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 public class PostServiceImpl implements PostService {
 
     @Autowired
@@ -392,27 +391,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostDTO> getAllDepartmentPosts(Long departmentId) {
         // HoD sees all approved posts in their department (department-wide, class, and group level)
-        List<Post> posts = postRepository.findAll().stream()
-                .filter(post -> post.getStatus() == PostStatus.APPROVED)
-                .filter(post -> {
-                    // Department-wide posts
-                    if (post.getTargetDepartment() != null) {
-                        return post.getTargetDepartment().getId().equals(departmentId);
-                    }
-                    // Class-level posts in this department
-                    if (post.getTargetClass() != null && post.getTargetClass().getDepartment() != null) {
-                        return post.getTargetClass().getDepartment().getId().equals(departmentId);
-                    }
-                    // Group-level posts in this department
-                    if (post.getTargetGroup() != null && post.getTargetGroup().getStudentClass() != null 
-                        && post.getTargetGroup().getStudentClass().getDepartment() != null) {
-                        return post.getTargetGroup().getStudentClass().getDepartment().getId().equals(departmentId);
-                    }
-                    return false;
-                })
-                .sorted((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()))
-                .collect(Collectors.toList());
-        
+        List<Post> posts = postRepository.findApprovedPostsByDepartment(departmentId);
         return posts.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
