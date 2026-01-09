@@ -553,17 +553,51 @@
         }
         
         @media (max-width: 768px) {
-            .sidebar {
-                display: none;
+            .filter-bar {
+                padding: 12px !important;
+                border-radius: 4px !important;
             }
             
-            .main-content {
-                max-width: 100%;
+            .filter-bar > div {
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            
+            .filter-bar input,
+            .filter-bar select {
+                width: 100% !important;
+                font-size: 14px !important;
+            }
+            
+            .post-card {
+                border-radius: 4px;
+                margin-bottom: 12px;
+            }
+            
+            .post-header {
+                padding: 12px 12px 0 12px;
+            }
+            
+            .post-content {
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            .post-badges {
+                padding: 0 12px 12px 12px;
+            }
+            
+            .section {
+                padding: 16px;
+                border-radius: 8px;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Mobile Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    
     <!-- Navbar -->
     <div th:replace="fragments/navbar :: studentNavbar"></div>
     
@@ -879,6 +913,58 @@
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             filterPosts();
+        });
+    </script>
+    
+    <!-- Mobile Sidebar Toggle Script -->
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+                
+                // Prevent body scroll when sidebar is open
+                if (sidebar.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
+        }
+        
+        function closeSidebarOnMobile() {
+            // Only close on mobile
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                
+                if (sidebar && overlay) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            }
+        }
+        
+        // Close sidebar when clicking overlay
+        document.addEventListener('DOMContentLoaded', function() {
+            const overlay = document.getElementById('sidebar-overlay');
+            if (overlay) {
+                overlay.addEventListener('click', toggleSidebar);
+            }
+            
+            // Show mobile header only on mobile
+            const mobileHeader = document.querySelector('.sidebar-mobile-header');
+            function checkMobile() {
+                if (mobileHeader) {
+                    mobileHeader.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
+                }
+            }
+            checkMobile();
+            window.addEventListener('resize', checkMobile);
         });
     </script>
     
