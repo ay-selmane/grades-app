@@ -2,32 +2,42 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
     <!-- Student Sidebar Fragment -->
-    <aside class="sidebar" th:fragment="studentSidebar(activePage)">
+    <aside class="sidebar" id="sidebar" th:fragment="studentSidebar(activePage)">
+        <div class="sidebar-mobile-header" style="display: none;">
+            <h3><i class="fas fa-bars"></i> Menu</h3>
+            <button class="sidebar-close-btn" onclick="toggleSidebar()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
         <div class="sidebar-nav">
             <a href="/student/dashboard" 
                th:classappend="${activePage == 'dashboard'} ? 'active' : ''"
-               class="nav-item">
+               class="nav-item"
+               onclick="closeSidebarOnMobile()">
                 <i class="fas fa-stream"></i>
                 <span>My Feed</span>
             </a>
             
             <a href="/student/schedule" 
                th:classappend="${activePage == 'schedule'} ? 'active' : ''"
-               class="nav-item">
+               class="nav-item"
+               onclick="closeSidebarOnMobile()">
                 <i class="fas fa-calendar-alt"></i>
                 <span>Schedule</span>
             </a>
             
             <a href="#" 
                th:classappend="${activePage == 'courses'} ? 'active' : ''"
-               class="nav-item">
+               class="nav-item"
+               onclick="closeSidebarOnMobile()">
                 <i class="fas fa-graduation-cap"></i>
                 <span>My Courses</span>
             </a>
             
             <a href="/student/grades" 
                th:classappend="${activePage == 'grades'} ? 'active' : ''"
-               class="nav-item">
+               class="nav-item"
+               onclick="closeSidebarOnMobile()">
                 <i class="fas fa-chart-line"></i>
                 <span>Grades</span>
             </a>
@@ -35,11 +45,18 @@
     </aside>
 
     <!-- Teacher/HoD Sidebar Fragment -->
-    <aside class="sidebar" th:fragment="teacherSidebar(activePage)">
+    <aside class="sidebar" id="sidebar" th:fragment="teacherSidebar(activePage)">
+        <div class="sidebar-mobile-header" style="display: none;">
+            <h3><i class="fas fa-bars"></i> Menu</h3>
+            <button class="sidebar-close-btn" onclick="toggleSidebar()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
         <div class="sidebar-nav">
             <a href="/teacher/dashboard" 
                th:classappend="${activePage == 'dashboard'} ? 'active' : ''"
-               class="nav-item">
+               class="nav-item"
+               onclick="closeSidebarOnMobile()">
                 <i class="fas fa-stream"></i>
                 <span th:if="${user.role.name() == 'HEAD_OF_DEPARTMENT'}">Department Feed</span>
                 <span th:if="${user.role.name() != 'HEAD_OF_DEPARTMENT'}">My Feed</span>
@@ -47,14 +64,16 @@
             
             <a href="/teacher/posts/new" 
                th:classappend="${activePage == 'create-post'} ? 'active' : ''"
-               class="nav-item">
+               class="nav-item"
+               onclick="closeSidebarOnMobile()">
                 <i class="fas fa-plus-circle"></i>
                 <span>Create Post</span>
             </a>
             
             <a href="/teacher/grades" 
                th:classappend="${activePage == 'grades'} ? 'active' : ''"
-               class="nav-item">
+               class="nav-item"
+               onclick="closeSidebarOnMobile()">
                 <i class="fas fa-chart-line"></i>
                 <span>Manage Grades</span>
             </a>
@@ -63,7 +82,8 @@
             <div th:if="${user.role.name() == 'HEAD_OF_DEPARTMENT'}">
                 <a href="/teacher/pending-approvals" 
                    th:classappend="${activePage == 'pending-approvals'} ? 'active' : ''"
-                   class="nav-item">
+                   class="nav-item"
+                   onclick="closeSidebarOnMobile()">
                     <i class="fas fa-tasks"></i>
                     <span>Pending Approvals</span>
                     <span th:if="${pendingCount != null && pendingCount > 0}" 
@@ -73,7 +93,8 @@
                 
                 <a href="/hod/manage" 
                    th:classappend="${activePage == 'manage-department'} ? 'active' : ''"
-                   class="nav-item">
+                   class="nav-item"
+                   onclick="closeSidebarOnMobile()">
                     <i class="fas fa-cogs"></i>
                     <span>Manage Department</span>
                 </a>

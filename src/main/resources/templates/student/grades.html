@@ -210,9 +210,16 @@
             font-weight: 700;
         }
         
+        /* Scrollable table wrapper for mobile */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+        
         .grades-table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 600px; /* Minimum width to trigger horizontal scroll */
         }
         
         .grades-table thead {
@@ -228,6 +235,23 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             border-bottom: 2px solid #e4e6eb;
+            white-space: nowrap;
+        }
+        
+        /* Sticky subject column */
+        .grades-table th:first-child,
+        .grades-table td:first-child {
+            position: sticky;
+            left: 0;
+            background: white;
+            z-index: 10;
+            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+            min-width: 150px;
+        }
+        
+        .grades-table thead th:first-child {
+            background: #f7f9fa;
+            z-index: 11;
         }
         
         .grades-table th.text-center {
@@ -393,26 +417,59 @@
         }
         
         @media (max-width: 768px) {
-            .sidebar {
-                display: none;
+            .semester-card {
+                border-radius: 4px;
+                margin-bottom: 12px;
             }
             
-            .main-content {
-                max-width: 100%;
-            }
-            
+            /* Make table more compact on mobile */
             .grades-table {
                 font-size: 12px;
+                min-width: 500px; /* Smaller minimum width for mobile */
             }
             
             .grades-table th,
             .grades-table td {
-                padding: 8px;
+                padding: 10px 8px;
+            }
+            
+            .grades-table th:first-child,
+            .grades-table td:first-child {
+                min-width: 120px; /* Smaller sticky column on mobile */
+                padding-left: 12px;
+            }
+            
+            .grade-value {
+                font-size: 11px;
+                padding: 3px 6px;
+                min-width: 40px;
+            }
+            
+            .coefficient-badge {
+                font-size: 11px;
+                padding: 2px 6px;
+            }
+            
+            .subject-name {
+                font-size: 13px;
+            }
+            
+            /* Semester toggle buttons - stack vertically on small screens */
+            .semester-toggle {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .semester-btn {
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Mobile Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    
     <!-- Navbar -->
     <div th:replace="fragments/navbar :: studentNavbar"></div>
     
@@ -449,17 +506,18 @@
 
                             <!-- Semester 1 Grades Table -->
                             <div class="semester-card">
-                                <table class="grades-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Subject</th>
-                                            <th class="text-center">Coef.</th>
-                                            <th class="text-center">Exam</th>
-                                            <th class="text-center">TD</th>
-                                            <th class="text-center">TP</th>
-                                            <th class="text-center">Final</th>
-                                        </tr>
-                                    </thead>
+                                <div class="table-wrapper">
+                                    <table class="grades-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Subject</th>
+                                                <th class="text-center">Coef.</th>
+                                                <th class="text-center">Exam</th>
+                                                <th class="text-center">TD</th>
+                                                <th class="text-center">TP</th>
+                                                <th class="text-center">Final</th>
+                                            </tr>
+                                        </thead>
                                     <tbody>
                                         <tr th:each="row : ${gradeRows}" th:if="${row.semester == 1}" th:attr="data-semester=${row.semester}, data-academicyear=${row.academicYear}">
                                             <td>
@@ -500,6 +558,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                                </div>
                             </div>
                         </div>
 
@@ -517,17 +576,18 @@
 
                             <!-- Semester 2 Grades Table -->
                             <div class="semester-card">
-                                <table class="grades-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Subject</th>
-                                            <th class="text-center">Coef.</th>
-                                            <th class="text-center">Exam</th>
-                                            <th class="text-center">TD</th>
-                                            <th class="text-center">TP</th>
-                                            <th class="text-center">Final</th>
-                                        </tr>
-                                    </thead>
+                                <div class="table-wrapper">
+                                    <table class="grades-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Subject</th>
+                                                <th class="text-center">Coef.</th>
+                                                <th class="text-center">Exam</th>
+                                                <th class="text-center">TD</th>
+                                                <th class="text-center">TP</th>
+                                                <th class="text-center">Final</th>
+                                            </tr>
+                                        </thead>
                                     <tbody>
                                         <tr th:each="row : ${gradeRows}" th:if="${row.semester == 2}" th:attr="data-semester=${row.semester}, data-academicyear=${row.academicYear}">
                                             <td>
@@ -568,6 +628,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -743,6 +804,54 @@
             // Initialize
             applyYearFilter();
             toggleSemester(1); // Start with semester 1
+        });
+    </script>
+    
+    <!-- Mobile Sidebar Toggle Script -->
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+                
+                if (sidebar.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
+        }
+        
+        function closeSidebarOnMobile() {
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                
+                if (sidebar && overlay) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const overlay = document.getElementById('sidebar-overlay');
+            if (overlay) {
+                overlay.addEventListener('click', toggleSidebar);
+            }
+            
+            const mobileHeader = document.querySelector('.sidebar-mobile-header');
+            function checkMobile() {
+                if (mobileHeader) {
+                    mobileHeader.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
+                }
+            }
+            checkMobile();
+            window.addEventListener('resize', checkMobile);
         });
     </script>
     
