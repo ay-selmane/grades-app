@@ -210,16 +210,9 @@
             font-weight: 700;
         }
         
-        /* Scrollable table wrapper for mobile */
-        .table-wrapper {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-        }
-        
         .grades-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 600px; /* Minimum width to trigger horizontal scroll */
         }
         
         .grades-table thead {
@@ -235,23 +228,6 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             border-bottom: 2px solid #e4e6eb;
-            white-space: nowrap;
-        }
-        
-        /* Sticky subject column */
-        .grades-table th:first-child,
-        .grades-table td:first-child {
-            position: sticky;
-            left: 0;
-            background: white;
-            z-index: 10;
-            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
-            min-width: 150px;
-        }
-        
-        .grades-table thead th:first-child {
-            background: #f7f9fa;
-            z-index: 11;
         }
         
         .grades-table th.text-center {
@@ -411,57 +387,87 @@
         }
         
         @media (max-width: 1200px) {
+            .layout-wrapper {
+                flex-wrap: wrap;
+            }
+            
             .right-sidebar {
+                order: -1;
+                width: 100%;
+                margin-bottom: 20px;
+                display: flex;
+                gap: 16px;
+                flex-wrap: wrap;
+            }
+            
+            .right-sidebar .sidebar-card {
+                flex: 1;
+                min-width: 200px;
+                position: static;
+            }
+            
+            .main-content {
+                width: 100%;
+            }
+            
+            .current-selection {
                 display: none;
             }
         }
         
         @media (max-width: 768px) {
-            .semester-card {
-                border-radius: 4px;
-                margin-bottom: 12px;
+            .main-content {
+                max-width: 100%;
+                width: 100%;
             }
             
-            /* Make table more compact on mobile */
-            .grades-table {
-                font-size: 12px;
-                min-width: 500px; /* Smaller minimum width for mobile */
-            }
-            
-            .grades-table th,
-            .grades-table td {
-                padding: 10px 8px;
-            }
-            
-            .grades-table th:first-child,
-            .grades-table td:first-child {
-                min-width: 120px; /* Smaller sticky column on mobile */
-                padding-left: 12px;
-            }
-            
-            .grade-value {
-                font-size: 11px;
-                padding: 3px 6px;
-                min-width: 40px;
-            }
-            
-            .coefficient-badge {
-                font-size: 11px;
-                padding: 2px 6px;
-            }
-            
-            .subject-name {
-                font-size: 13px;
-            }
-            
-            /* Semester toggle buttons - stack vertically on small screens */
-            .semester-toggle {
+            .right-sidebar {
                 flex-direction: column;
+                gap: 12px;
+            }
+            
+            .right-sidebar .sidebar-card {
+                flex: none;
+                width: 100%;
+            }
+            
+            /* Make semester toggle buttons horizontal and prominent */
+            .semester-toggle {
+                flex-direction: row;
                 gap: 8px;
             }
             
             .semester-btn {
-                width: 100%;
+                flex: 1;
+                padding: 16px 12px;
+                font-size: 15px;
+                justify-content: center;
+            }
+            
+            .semester-btn span {
+                font-size: 14px;
+            }
+            
+            .semester-btn i {
+                font-size: 18px;
+            }
+            
+            .sidebar-card-title {
+                font-size: 14px;
+                margin-bottom: 12px;
+            }
+            
+            .grades-table {
+                font-size: 11px;
+            }
+            
+            .grades-table th,
+            .grades-table td {
+                padding: 6px 3px;
+            }
+            
+            .subject-name {
+                font-size: 12px;
             }
         }
     </style>
@@ -506,18 +512,17 @@
 
                             <!-- Semester 1 Grades Table -->
                             <div class="semester-card">
-                                <div class="table-wrapper">
-                                    <table class="grades-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Subject</th>
-                                                <th class="text-center">Coef.</th>
-                                                <th class="text-center">Exam</th>
-                                                <th class="text-center">TD</th>
-                                                <th class="text-center">TP</th>
-                                                <th class="text-center">Final</th>
-                                            </tr>
-                                        </thead>
+                                <table class="grades-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th class="text-center">Coef.</th>
+                                            <th class="text-center">Exam</th>
+                                            <th class="text-center">TD</th>
+                                            <th class="text-center">TP</th>
+                                            <th class="text-center">Final</th>
+                                        </tr>
+                                    </thead>
                                     <tbody>
                                         <tr th:each="row : ${gradeRows}" th:if="${row.semester == 1}" th:attr="data-semester=${row.semester}, data-academicyear=${row.academicYear}">
                                             <td>
@@ -558,7 +563,6 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                                </div>
                             </div>
                         </div>
 
@@ -576,18 +580,17 @@
 
                             <!-- Semester 2 Grades Table -->
                             <div class="semester-card">
-                                <div class="table-wrapper">
-                                    <table class="grades-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Subject</th>
-                                                <th class="text-center">Coef.</th>
-                                                <th class="text-center">Exam</th>
-                                                <th class="text-center">TD</th>
-                                                <th class="text-center">TP</th>
-                                                <th class="text-center">Final</th>
-                                            </tr>
-                                        </thead>
+                                <table class="grades-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th class="text-center">Coef.</th>
+                                            <th class="text-center">Exam</th>
+                                            <th class="text-center">TD</th>
+                                            <th class="text-center">TP</th>
+                                            <th class="text-center">Final</th>
+                                        </tr>
+                                    </thead>
                                     <tbody>
                                         <tr th:each="row : ${gradeRows}" th:if="${row.semester == 2}" th:attr="data-semester=${row.semester}, data-academicyear=${row.academicYear}">
                                             <td>
@@ -628,7 +631,6 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -675,6 +677,53 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
+        // Mobile sidebar toggle function
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            
+            if (sidebar) {
+                sidebar.classList.toggle('active');
+            }
+            
+            if (overlay) {
+                overlay.classList.toggle('active');
+            }
+            
+            // Toggle body scroll
+            if (sidebar && sidebar.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Close sidebar on mobile when clicking nav links
+        function closeSidebarOnMobile() {
+            if (window.innerWidth <= 768) {
+                const sidebar = document.querySelector('.sidebar');
+                const overlay = document.querySelector('.sidebar-overlay');
+                
+                if (sidebar) {
+                    sidebar.classList.remove('active');
+                }
+                
+                if (overlay) {
+                    overlay.classList.remove('active');
+                }
+                
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Close sidebar when clicking overlay
+        document.addEventListener('DOMContentLoaded', function() {
+            const overlay = document.querySelector('.sidebar-overlay');
+            if (overlay) {
+                overlay.addEventListener('click', toggleSidebar);
+            }
+        });
+        
         document.addEventListener('DOMContentLoaded', function() {
             const yearSelect = document.getElementById('yearSelect');
             const displayYear = document.getElementById('displayYear');
@@ -817,6 +866,7 @@
                 sidebar.classList.toggle('active');
                 overlay.classList.toggle('active');
                 
+                // Prevent body scroll when sidebar is open
                 if (sidebar.classList.contains('active')) {
                     document.body.style.overflow = 'hidden';
                 } else {
@@ -826,6 +876,7 @@
         }
         
         function closeSidebarOnMobile() {
+            // Only close on mobile
             if (window.innerWidth <= 768) {
                 const sidebar = document.getElementById('sidebar');
                 const overlay = document.getElementById('sidebar-overlay');
@@ -838,12 +889,14 @@
             }
         }
         
+        // Close sidebar when clicking overlay
         document.addEventListener('DOMContentLoaded', function() {
             const overlay = document.getElementById('sidebar-overlay');
             if (overlay) {
                 overlay.addEventListener('click', toggleSidebar);
             }
             
+            // Show mobile header only on mobile
             const mobileHeader = document.querySelector('.sidebar-mobile-header');
             function checkMobile() {
                 if (mobileHeader) {
