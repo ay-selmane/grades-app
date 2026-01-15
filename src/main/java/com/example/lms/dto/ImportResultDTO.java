@@ -8,11 +8,13 @@ public class ImportResultDTO {
     private int validRows;
     private int invalidRows;
     private List<String> errors;
+    private List<String> messages;
     private List<ImportRowDTO> validData;
     private boolean success;
 
     public ImportResultDTO() {
         this.errors = new ArrayList<>();
+        this.messages = new ArrayList<>();
         this.validData = new ArrayList<>();
     }
 
@@ -51,6 +53,18 @@ public class ImportResultDTO {
 
     public void addError(String error) {
         this.errors.add(error);
+    }
+    
+    public List<String> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<String> messages) {
+        this.messages = messages;
+    }
+    
+    public void addMessage(String message) {
+        this.messages.add(message);
     }
 
     public List<ImportRowDTO> getValidData() {

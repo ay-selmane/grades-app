@@ -46,6 +46,12 @@ public class ExcelServiceImpl implements ExcelService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private GradeRepository gradeRepository;
+    
+    @Autowired
+    private TeacherAssignmentRepository teacherAssignmentRepository;
 
     @Override
     public Resource generateStudentTemplate() throws IOException {
@@ -779,5 +785,271 @@ public class ExcelServiceImpl implements ExcelService {
         }
         
         return imported;
+    }
+    
+    @Override
+    public Resource generateGradeTemplate(Long assignmentId, Long groupId, String gradeType) throws IOException {
+        // Get teacher assignment
+        TeacherAssignment assignment = teacherAssignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new RuntimeException("Assignment not found"));
+        
+        // Get students in the class/group
+        List<Student> students;
+        if (groupId != null) {
+            students = studentRepository.findByGroupId(groupId);
+        } else {
+            students = studentRepository.findByStudentClassId(assignment.getStudentClass().getId());
+        }
+        
+        // Get or create grades for each student
+        List<Grade> grades = new java.util.ArrayList<>();
+        for (Student student : students) {
+            Grade grade = gradeRepository.findByStudentIdAndSubjectIdAndSemester(
+                    student.getId(),
+                    assignment.getSubject().getId(),
+                    assignment.getSemester()
+            ).orElseGet(() -> {
+                // Create grade record if it doesn't exist
+                Grade newGrade = new Grade();
+                newGrade.setStudent(student);
+                newGrade.setSubject(assignment.getSubject());
+                newGrade.setStudentClass(student.getStudentClass());
+                newGrade.setSemester(assignment.getSemester());
+                newGrade.setAcademicYear(assignment.getAcademicYear());
+                return gradeRepository.save(newGrade);
+            });
+            grades.add(grade);
+        }
+        
+        // Create workbook
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("note");
+        
+        // Header info (Row 1) - Generic, no grade type
+        Row headerInfoRow = sheet.createRow(0);
+        Cell headerInfoCell = headerInfoRow.createCell(0);
+        String groupName = groupId != null ? 
+            assignment.getGroup() != null ? assignment.getGroup().getName() : "Tous les groupes" : 
+            "Tous les groupes";
+        headerInfoCell.setCellValue(
+            assignment.getTeacher().getUser().getFirstName() + " " + 
+            assignment.getTeacher().getUser().getLastName() + "/" +
+            assignment.getSubject().getName() + "/" +
+            "Semestre " + assignment.getSemester() + "/" +
+            groupName
+        );
+        
+        // Create header style
+        CellStyle headerStyle = workbook.createCellStyle();
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerStyle.setFont(headerFont);
+        
+        // Create text format style for student IDs
+        CellStyle textStyle = workbook.createCellStyle();
+        DataFormat format = workbook.createDataFormat();
+        textStyle.setDataFormat(format.getFormat("@")); // @ means text format
+        
+        // Column headers (Row 2)
+        Row headerRow = sheet.createRow(1);
+        String[] headers = {"Matricule", "Nom   ", "Prénom", "Note", "Absent", 
+                           "Absence Justifiée", "Observation", "Section", "Groupe"};
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+            cell.setCellStyle(headerStyle);
+            sheet.setColumnWidth(i, 4000);
+        }
+        
+        // Data rows
+        int rowNum = 2;
+        for (Grade grade : grades) {
+            Row row = sheet.createRow(rowNum++);
+            
+            // Student ID - explicitly set as text to preserve format
+            Cell idCell = row.createCell(0);
+            idCell.setCellValue(grade.getStudent().getStudentId() != null ? 
+                grade.getStudent().getStudentId() : "");
+            idCell.setCellStyle(textStyle); // Apply text format
+            
+            // Last Name
+            row.createCell(1).setCellValue(grade.getStudent().getUser().getLastName());
+            
+            // First Name
+            row.createCell(2).setCellValue(grade.getStudent().getUser().getFirstName());
+            
+            // Note - Leave empty for teacher to fill
+            row.createCell(3).setCellValue("");
+            
+            // Empty cells for Absent, Absence Justifiée, Observation
+            row.createCell(4).setCellValue("");
+            row.createCell(5).setCellValue("");
+            row.createCell(6).setCellValue("");
+            
+            // Section (Class name)
+            row.createCell(7).setCellValue(grade.getStudent().getStudentClass().getName());
+            
+            // Group
+            row.createCell(8).setCellValue(grade.getStudent().getGroup() != null ? 
+                grade.getStudent().getGroup().getName() : "");
+        }
+        
+        // Write to byte array
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        
+        return new ByteArrayResource(outputStream.toByteArray());
+    }
+    
+    @Override
+    @Transactional
+    public ImportResultDTO importGradesFromExcel(MultipartFile file, Long assignmentId, Long groupId, String gradeType) throws IOException {
+        ImportResultDTO result = new ImportResultDTO();
+        java.util.Map<Long, Double> gradeValues = new java.util.HashMap<>();
+        
+        // Validate teacher assignment exists
+        TeacherAssignment assignment = teacherAssignmentRepository.findById(assignmentId)
+                .orElse(null);
+        if (assignment == null) {
+            result.addError("Assignment not found");
+            result.setSuccess(false);
+            return result;
+        }
+        
+        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+            Sheet sheet = workbook.getSheetAt(0);
+            
+            // Skip header info row (0) and column header row (1)
+            int successCount = 0;
+            int errorCount = 0;
+            
+            for (int i = 2; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if (row == null) continue;
+                
+                // Check if row is empty
+                Cell studentIdCell = row.getCell(0);
+                if (studentIdCell == null || getCellValueAsString(studentIdCell).trim().isEmpty()) {
+                    continue;
+                }
+                
+                try {
+                    // Get student ID and trim whitespace
+                    String studentId = getCellValueAsString(studentIdCell).trim();
+                    
+                    // Get note value
+                    Cell noteCell = row.getCell(3);
+                    Double noteValue = null;
+                    if (noteCell != null) {
+                        String noteStr = getCellValueAsString(noteCell).trim();
+                        if (!noteStr.isEmpty()) {
+                            try {
+                                noteValue = Double.parseDouble(noteStr);
+                                // Validate grade range
+                                if (noteValue < 0 || noteValue > 20) {
+                                    result.addError("Row " + (i + 1) + ": Grade must be between 0 and 20");
+                                    errorCount++;
+                                    continue;
+                                }
+                            } catch (NumberFormatException e) {
+                                result.addError("Row " + (i + 1) + ": Invalid grade format");
+                                errorCount++;
+                                continue;
+                            }
+                        }
+                    }
+                    
+                    // Find student
+                    Student student = studentRepository.findByStudentId(studentId).orElse(null);
+                    if (student == null) {
+                        result.addError("Row " + (i + 1) + ": Student not found with ID '" + studentId + "'. Make sure you're using the template downloaded from this system.");
+                        errorCount++;
+                        continue;
+                    }
+                    
+                    // Find grade record by student, subject, and semester
+                    Grade grade = gradeRepository.findByStudentIdAndSubjectIdAndSemester(
+                            student.getId(), 
+                            assignment.getSubject().getId(), 
+                            assignment.getSemester()
+                    ).orElse(null);
+                    
+                    if (grade == null) {
+                        result.addError("Row " + (i + 1) + ": Grade record not found for student " + studentId);
+                        errorCount++;
+                        continue;
+                    }
+                    
+                    // Update grade based on type
+                    if ("TP".equalsIgnoreCase(gradeType)) {
+                        grade.setTp(noteValue);
+                    } else if ("TD".equalsIgnoreCase(gradeType)) {
+                        grade.setTd(noteValue);
+                    } else if ("EXAM".equalsIgnoreCase(gradeType)) {
+                        grade.setExamen(noteValue);
+                    }
+                    
+                    // Don't save yet - just prepare the data for preview
+                    // Store the grade values to return
+                    successCount++;
+                    
+                } catch (Exception e) {
+                    result.addError("Row " + (i + 1) + ": " + e.getMessage());
+                    errorCount++;
+                }
+            }
+            
+            result.setSuccess(errorCount == 0);
+            result.setValidRows(successCount);
+            if (successCount > 0) {
+                result.addMessage(successCount + " grades loaded from Excel (not saved yet - click 'Save All Grades' to save)");
+            }
+            if (errorCount > 0) {
+                result.addMessage(errorCount + " rows had errors");
+            }
+            
+            // Add grade values to result so frontend can populate the form
+            List<ImportRowDTO> importedData = new java.util.ArrayList<>();
+            for (java.util.Map.Entry<Long, Double> entry : gradeValues.entrySet()) {
+                ImportRowDTO rowData = new ImportRowDTO();
+                rowData.setGradeId(entry.getKey());
+                rowData.setGradeValue(entry.getValue());
+                rowData.setGradeType(gradeType);
+                importedData.add(rowData);
+            }
+            result.setValidData(importedData);
+            
+        } catch (Exception e) {
+            result.addError("Error reading Excel file: " + e.getMessage());
+            result.setSuccess(false);
+        }
+        
+        return result;
+    }
+    
+    private String getCellValueAsString(Cell cell) {
+        if (cell == null) return "";
+        
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    return cell.getLocalDateTimeCellValue().toString();
+                }
+                // For numeric cells, return as string without decimal if it's a whole number
+                double numValue = cell.getNumericCellValue();
+                if (numValue == Math.floor(numValue)) {
+                    return String.valueOf((long) numValue);
+                }
+                return String.valueOf(numValue);
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case FORMULA:
+                return cell.getCellFormula();
+            default:
+                return "";
+        }
     }
 }
