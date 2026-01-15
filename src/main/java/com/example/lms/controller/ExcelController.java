@@ -162,4 +162,66 @@ public class ExcelController {
             return ResponseEntity.internalServerError().body("Error importing teachers: " + e.getMessage());
         }
     }
+    
+    /**
+     * Download grade template Excel file for specific assignment and grade type
+     */
+    @GetMapping("/grades/template")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<Resource> downloadGradeTemplate(
+            @RequestParam Long assignmentId,
+            @RequestParam(required = false) Long groupId,
+            @RequestParam String gradeType) {
+        try {
+            System.out.println("🔍 Downloading grade template - AssignmentId: " + assignmentId + ", GroupId: " + groupId + ", Type: " + gradeType);
+            Resource resource = excelService.generateGradeTemplate(assignmentId, groupId, gradeType);
+            
+            String filename = "grades_template_" + 
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".xlsx";
+            
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                    .body(resource);
+        } catch (Exception e) {
+            System.err.println("❌ Error generating grade template: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
+    /**
+     * Import grades from Excel file
+     */
+    @PostMapping("/grades/import")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<ImportResultDTO> importGrades(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam Long assignmentId,
+            @RequestParam(required = false) Long groupId,
+            @RequestParam String gradeType) {
+        try {
+            if (file.isEmpty()) {
+                ImportResultDTO result = new ImportResultDTO();
+                result.addError("File is empty");
+                result.setSuccess(false);
+                return ResponseEntity.badRequest().body(result);
+            }
+            
+            if (!file.getOriginalFilename().endsWith(".xlsx")) {
+                ImportResultDTO result = new ImportResultDTO();
+                result.addError("Only .xlsx files are supported");
+                result.setSuccess(false);
+                return ResponseEntity.badRequest().body(result);
+            }
+            
+            ImportResultDTO result = excelService.importGradesFromExcel(file, assignmentId, groupId, gradeType);
+            return ResponseEntity.ok(result);
+        } catch (IOException e) {
+            ImportResultDTO result = new ImportResultDTO();
+            result.addError("Error reading file: " + e.getMessage());
+            result.setSuccess(false);
+            return ResponseEntity.internalServerError().body(result);
+        }
+    }
 }

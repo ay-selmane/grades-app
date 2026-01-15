@@ -45,4 +45,23 @@ public interface ExcelService {
      * @return Number of teachers imported
      */
     int importTeachers(ImportResultDTO result);
+    
+    /**
+     * Generate Excel template for grade entry with student data pre-filled
+     * @param assignmentId Teacher assignment ID
+     * @param groupId Group ID (optional, for specific group)
+     * @param gradeType Type of grade (TP, TD, EXAM)
+     * @return Excel file as Resource
+     */
+    Resource generateGradeTemplate(Long assignmentId, Long groupId, String gradeType) throws IOException;
+    
+    /**
+     * Import grades from Excel file
+     * @param file Excel file containing grades
+     * @param assignmentId Teacher assignment ID
+     * @param groupId Group ID (optional)
+     * @param gradeType Type of grade (TP, TD, EXAM)
+     * @return ImportResultDTO with import results
+     */
+    ImportResultDTO importGradesFromExcel(MultipartFile file, Long assignmentId, Long groupId, String gradeType) throws IOException;
 }

@@ -28,6 +28,11 @@ public class ImportRowDTO {
     private Long departmentId;
     private Long classId;
     private Long groupId;
+    
+    // Grade import fields
+    private Long gradeId;
+    private Double gradeValue;
+    private String gradeType;
 
     // Getters and Setters
     public String getStudentId() {
@@ -188,5 +193,29 @@ public class ImportRowDTO {
 
     public void setGroupId(Long groupId) {
         this.groupId = groupId;
+    }
+    
+    public Long getGradeId() {
+        return gradeId;
+    }
+    
+    public void setGradeId(Long gradeId) {
+        this.gradeId = gradeId;
+    }
+    
+    public Double getGradeValue() {
+        return gradeValue;
+    }
+    
+    public void setGradeValue(Double gradeValue) {
+        this.gradeValue = gradeValue;
+    }
+    
+    public String getGradeType() {
+        return gradeType;
+    }
+    
+    public void setGradeType(String gradeType) {
+        this.gradeType = gradeType;
     }
 }
