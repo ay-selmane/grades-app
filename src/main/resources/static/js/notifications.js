@@ -76,17 +76,23 @@ function updateBadge(badgeId, count) {
  */
 async function markTypeAsRead(type) {
     try {
+        console.log(`🔄 Marking ${type} notifications as read...`);
         const response = await fetch(`/api/notifications/mark-type-read/${type}`, {
             method: 'PUT',
             credentials: 'include'
         });
         
         if (response.ok) {
-            // Immediately update badges after marking as read
-            updateNotificationBadges();
+            console.log(`✅ ${type} notifications marked as read successfully`);
+            // Wait a moment then update badges to show the change
+            setTimeout(() => {
+                updateNotificationBadges();
+            }, 100);
+        } else {
+            console.warn(`⚠️ Failed to mark ${type} as read:`, response.status);
         }
     } catch (error) {
-        console.error('Error marking notifications as read:', error);
+        console.error(`❌ Error marking ${type} notifications as read:`, error);
     }
 }
 
@@ -95,6 +101,9 @@ async function markTypeAsRead(type) {
  * Called when the page loads
  */
 function initNotifications() {
+    // Mark current page notifications as read when arriving
+    markCurrentPageAsRead();
+    
     // Initial fetch
     updateNotificationBadges();
     
@@ -104,66 +113,25 @@ function initNotifications() {
     }
     notificationInterval = setInterval(updateNotificationBadges, 30000);
     
-    // Add click handlers to sidebar links to mark notifications as read when leaving
-    setupNotificationClickHandlers();
-    
     console.log('🔔 Notification system initialized');
 }
 
 /**
- * Store the current page path to detect navigation
+ * Mark notifications as read based on current page
  */
-let currentPagePath = window.location.pathname;
-
-/**
- * Setup click handlers for sidebar links
- * Marks notifications as read when user LEAVES a section (clicks away from it)
- */
-function setupNotificationClickHandlers() {
+async function markCurrentPageAsRead() {
     const currentPath = window.location.pathname;
     
-    // Get all navigation links
-    const gradesLink = document.querySelector('a[href*="/grades"]');
-    const feedLink = document.querySelector('a[href*="/dashboard"]');
-    const scheduleLink = document.querySelector('a[href*="/schedule"]');
-    
-    // When clicking ANY navigation link, mark the CURRENT page's notifications as read
-    const allNavLinks = [gradesLink, feedLink, scheduleLink].filter(link => link !== null);
-    
-    allNavLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            // Determine what type of page we're currently on and mark it as read
-            if (currentPath.includes('/grades')) {
-                // We're leaving grades page - mark grade notifications as read
-                console.log('📖 Leaving grades page, marking as read...');
-                fetch('/api/notifications/mark-type-read/GRADE_PUBLISHED', {
-                    method: 'PUT',
-                    credentials: 'include',
-                    keepalive: true  // Ensure request completes even during navigation
-                }).catch(err => console.error('Error:', err));
-            } else if (currentPath.includes('/dashboard')) {
-                // We're leaving dashboard/feed page - mark feed notifications as read
-                console.log('📖 Leaving feed page, marking as read...');
-                fetch('/api/notifications/mark-type-read/URGENT_POST', {
-                    method: 'PUT',
-                    credentials: 'include',
-                    keepalive: true
-                }).catch(err => console.error('Error:', err));
-            } else if (currentPath.includes('/schedule')) {
-                // We're leaving schedule page - mark schedule notifications as read
-                console.log('📖 Leaving schedule page, marking as read...');
-                fetch('/api/notifications/mark-type-read/SCHEDULE_CHANGE', {
-                    method: 'PUT',
-                    credentials: 'include',
-                    keepalive: true
-                }).catch(err => console.error('Error:', err));
-            }
-            // Note: We don't prevent default, so navigation continues normally
-            // The next page will fetch fresh badge counts automatically on load
-        });
-    });
-    
-    console.log('✅ Click handlers attached to navigation links');
+    if (currentPath.includes('/grades')) {
+        console.log('📖 On grades page, marking grade notifications as read...');
+        await markTypeAsRead('GRADE_PUBLISHED');
+    } else if (currentPath.includes('/dashboard')) {
+        console.log('📖 On dashboard page, marking feed notifications as read...');
+        await markTypeAsRead('URGENT_POST');
+    } else if (currentPath.includes('/schedule')) {
+        console.log('📖 On schedule page, marking schedule notifications as read...');
+        await markTypeAsRead('SCHEDULE_CHANGE');
+    }
 }
 
 /**

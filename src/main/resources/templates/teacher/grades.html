@@ -169,6 +169,385 @@
         .semester-btn.active i {
             color: white;
         }
+        
+        /* Card Actions Section - Better hierarchy and styling */
+        .card-actions {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #e4e6eb;
+        }
+        
+        /* Primary Action Button */
+        .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn-primary {
+            background: linear-gradient(135deg, #5624d0 0%, #8710d8 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(86, 36, 208, 0.25);
+        }
+        
+        .action-btn-primary:hover {
+            background: linear-gradient(135deg, #3b1a8f 0%, #6b0cac 100%);
+            box-shadow: 0 4px 12px rgba(86, 36, 208, 0.35);
+            transform: translateY(-1px);
+        }
+        
+        .action-btn i {
+            font-size: 16px;
+        }
+        
+        /* Excel Import Section */
+        .excel-actions {
+            margin-top: 16px;
+            padding: 12px;
+            background: #f7f9fa;
+            border-radius: 8px;
+            border: 1px solid #e4e6eb;
+        }
+        
+        .excel-actions-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1c1d1f;
+        }
+        
+        .excel-actions-header i {
+            color: #217346;
+            font-size: 16px;
+        }
+        
+        .template-link {
+            margin-left: auto;
+            color: #5624d0;
+            font-size: 12px;
+            font-weight: 500;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .template-link:hover {
+            color: #3b1a8f;
+            text-decoration: underline;
+        }
+        
+        .template-link i {
+            font-size: 11px;
+        }
+        
+        /* Excel Import Buttons */
+        .excel-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        
+        .excel-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 12px;
+            border: 1px solid #d1d7dc;
+            background: white;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .excel-btn i {
+            font-size: 14px;
+        }
+        
+        .excel-btn-exam {
+            color: #c92a2a;
+            border-color: #f8d7da;
+        }
+        
+        .excel-btn-exam:hover {
+            background: #fff5f5;
+            border-color: #c92a2a;
+            color: #a61e1e;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(201, 42, 42, 0.15);
+        }
+        
+        .excel-btn-td {
+            color: #0c8599;
+            border-color: #cfe2ff;
+        }
+        
+        .excel-btn-td:hover {
+            background: #e7f5ff;
+            border-color: #0c8599;
+            color: #0a6d7d;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(12, 133, 153, 0.15);
+        }
+        
+        .excel-btn-tp {
+            color: #d77f00;
+            border-color: #fff3cd;
+        }
+        
+        .excel-btn-tp:hover {
+            background: #fff8e6;
+            border-color: #d77f00;
+            color: #b36800;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(215, 127, 0, 0.15);
+        }
+        
+        /* Remove hover effect from card when interacting with buttons */
+        .assignment-card .card-actions * {
+            cursor: default;
+        }
+        
+        .assignment-card .card-actions button,
+        .assignment-card .card-actions a {
+            cursor: pointer;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .excel-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .excel-actions-header {
+                flex-wrap: wrap;
+            }
+            
+            .template-link {
+                margin-left: 0;
+                width: 100%;
+                justify-content: center;
+                margin-top: 8px;
+            }
+            
+            .action-btn {
+                font-size: 14px;
+                padding: 10px 16px;
+            }
+        }
+        
+        /* Modal Action Bar Styles */
+        .modal-actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 2px solid #e9ecef;
+            border-radius: 0 0 8px 8px;
+            margin: 0 -16px -16px;
+        }
+        
+        .actions-left {
+            flex: 1;
+        }
+        
+        .actions-right {
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Excel Import Section in Modal */
+        .excel-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .excel-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1c1d1f;
+        }
+        
+        .excel-header i {
+            color: #217346;
+            font-size: 16px;
+        }
+        
+        .excel-buttons-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .import-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: 1px solid;
+            background: white;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .import-btn i {
+            font-size: 13px;
+        }
+        
+        .import-exam {
+            color: #c92a2a;
+            border-color: #f8d7da;
+        }
+        
+        .import-exam:hover {
+            background: #fff5f5;
+            border-color: #c92a2a;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(201, 42, 42, 0.15);
+        }
+        
+        .import-td {
+            color: #0c8599;
+            border-color: #cfe2ff;
+        }
+        
+        .import-td:hover {
+            background: #e7f5ff;
+            border-color: #0c8599;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(12, 133, 153, 0.15);
+        }
+        
+        .import-tp {
+            color: #d77f00;
+            border-color: #fff3cd;
+        }
+        
+        .import-tp:hover {
+            background: #fff8e6;
+            border-color: #d77f00;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(215, 127, 0, 0.15);
+        }
+        
+        .download-template-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #5624d0;
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .download-template-link:hover {
+            color: #3b1a8f;
+            text-decoration: underline;
+        }
+        
+        .download-template-link i {
+            font-size: 12px;
+        }
+        
+        /* Save All Button */
+        .btn-save-all {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.25);
+        }
+        
+        .btn-save-all:hover {
+            background: linear-gradient(135deg, #218838 0%, #1ba87d 100%);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.35);
+            transform: translateY(-1px);
+        }
+        
+        .btn-save-all i {
+            font-size: 16px;
+        }
+        
+        /* Modal Table Improvements */
+        .modal-body .table thead th {
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .modal-body .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .modal-body .table input.form-control {
+            border: 1px solid #dee2e6;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-body .table input.form-control:focus {
+            border-color: #5624d0;
+            box-shadow: 0 0 0 0.2rem rgba(86, 36, 208, 0.15);
+        }
+        
+        /* Responsive Modal Actions */
+        @media (max-width: 768px) {
+            .modal-actions-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .actions-right {
+                justify-content: stretch;
+            }
+            
+            .btn-save-all {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .excel-buttons-group {
+                flex-direction: column;
+            }
+            
+            .import-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -217,8 +596,9 @@
                     <div th:if="${assignments != null && !assignments.isEmpty()}">
                         <div th:each="assignment : ${assignments}" 
                              class="assignment-card"
-                             th:attr="data-semester=${assignment.semester},data-assignment-id=${assignment.id},data-group-id=${assignment.group != null ? assignment.group.id : 'null'},data-subject-name=${assignment.subject.name},data-group-name=${assignment.group != null ? assignment.group.name : 'All Groups'}"
-                             onclick="showGradeModalFromData(this)">
+                             th:attr="data-semester=${assignment.semester},data-assignment-id=${assignment.id},data-group-id=${assignment.group != null ? assignment.group.id : 'null'},data-subject-name=${assignment.subject.name},data-group-name=${assignment.group != null ? assignment.group.name : 'All Groups'},data-subject-id=${assignment.subject.id},data-class-id=${assignment.studentClass.id}">
+                            
+                            <!-- Card Header -->
                             <div class="assignment-header">
                                 <div>
                                     <div class="assignment-title" th:text="${assignment.subject.name}">Subject Name</div>
@@ -226,6 +606,8 @@
                                 </div>
                                 <div class="assignment-badge" th:text="'Semester ' + ${assignment.semester}">Semester 1</div>
                             </div>
+                            
+                            <!-- Card Meta Info -->
                             <div class="assignment-meta">
                                 <div class="meta-item">
                                     <i class="fas fa-users"></i>
@@ -239,6 +621,18 @@
                                     <i class="fas fa-star"></i>
                                     <span>Coef: <span th:text="${assignment.subject.coefficient}">3</span></span>
                                 </div>
+                            </div>
+                            
+                            <!-- Quick Actions Section -->
+                            <div class="card-actions">
+                                <!-- Primary Action -->
+                                <button class="action-btn action-btn-primary" 
+                                        onclick="showGradeModalFromData(this.closest('.assignment-card'))">
+                                    <i class="fas fa-edit"></i>
+                                    <span>Enter Grades</span>
+                                </button>
+                                
+                                
                             </div>
                         </div>
                     </div>
@@ -384,16 +778,16 @@
             
             let html = `
                 <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead style="background: #f7f9fa;">
+                    <table class="table table-hover align-middle">
+                        <thead style="background: linear-gradient(135deg, #f7f9fa 0%, #ffffff 100%); position: sticky; top: 0; z-index: 10;">
                             <tr>
-                                <th>Student ID</th>
-                                <th>Student Name</th>
-                                <th style="width: 120px;">Exam (/ 20)</th>
-                                <th style="width: 120px;">TD (/ 20)</th>
-                                <th style="width: 120px;">TP (/ 20)</th>
-                                <th style="width: 100px;">Final</th>
-                                <th style="width: 80px;">Action</th>
+                                <th style="padding: 12px;">Student ID</th>
+                                <th style="padding: 12px;">Student Name</th>
+                                <th style="width: 120px; padding: 12px; text-align: center;">Exam<br><small class="text-muted">(/ 20)</small></th>
+                                <th style="width: 120px; padding: 12px; text-align: center;">TD<br><small class="text-muted">(/ 20)</small></th>
+                                <th style="width: 120px; padding: 12px; text-align: center;">TP<br><small class="text-muted">(/ 20)</small></th>
+                                <th style="width: 100px; padding: 12px; text-align: center;">Final</th>
+                                <th style="width: 80px; padding: 12px; text-align: center;">Save</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -405,13 +799,13 @@
                 
                 html += `
                     <tr data-grade-id="${grade.id}">
-                        <td><strong>${grade.studentIdNumber || 'N/A'}</strong></td>
-                        <td>${grade.studentName || 'Student ' + grade.id}</td>
-                        <td><input type="number" class="form-control form-control-sm" step="0.25" min="0" max="20" value="${grade.examen || ''}" onchange="updateGrade(${grade.id}, 'examen', this.value)"></td>
-                        <td><input type="number" class="form-control form-control-sm" step="0.25" min="0" max="20" value="${grade.td || ''}" onchange="updateGrade(${grade.id}, 'td', this.value)"></td>
-                        <td><input type="number" class="form-control form-control-sm" step="0.25" min="0" max="20" value="${grade.tp || ''}" onchange="updateGrade(${grade.id}, 'tp', this.value)"></td>
-                        <td class="${finalClass}">${finalGrade}</td>
-                        <td><button class="btn btn-sm btn-primary" onclick="saveGrade(${grade.id})"><i class="fas fa-save"></i></button></td>
+                        <td><span class="badge bg-secondary">${grade.studentIdNumber || 'N/A'}</span></td>
+                        <td><strong>${grade.studentName || 'Student ' + grade.id}</strong></td>
+                        <td style="text-align: center;"><input type="number" class="form-control form-control-sm text-center" step="0.25" min="0" max="20" value="${grade.examen || ''}" onchange="updateGrade(${grade.id}, 'examen', this.value)" placeholder="--"></td>
+                        <td style="text-align: center;"><input type="number" class="form-control form-control-sm text-center" step="0.25" min="0" max="20" value="${grade.td || ''}" onchange="updateGrade(${grade.id}, 'td', this.value)" placeholder="--"></td>
+                        <td style="text-align: center;"><input type="number" class="form-control form-control-sm text-center" step="0.25" min="0" max="20" value="${grade.tp || ''}" onchange="updateGrade(${grade.id}, 'tp', this.value)" placeholder="--"></td>
+                        <td class="${finalClass}" style="text-align: center; font-size: 16px;">${finalGrade}</td>
+                        <td style="text-align: center;"><button class="btn btn-sm btn-outline-primary" onclick="saveGrade(${grade.id})" title="Save this grade"><i class="fas fa-save"></i></button></td>
                     </tr>
                 `;
             });
@@ -420,35 +814,38 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-3">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6 class="mb-3"><i class="fas fa-file-excel text-success"></i> Excel Import/Export</h6>
-                            <div class="mb-2">
-                                <a href="#" class="btn btn-sm btn-success" onclick="exportGradeTemplate(); return false;">
-                                    <i class="fas fa-download"></i> Download Grade Template
-                                </a>
+                
+                <!-- Action Bar with Better Hierarchy -->
+                <div class="modal-actions-bar">
+                    <div class="actions-left">
+                        <!-- Excel Import Section -->
+                        <div class="excel-section">
+                            <div class="excel-header">
+                                <i class="fas fa-file-excel"></i>
+                                <span>Bulk Import</span>
                             </div>
-                            <div class="mb-2">
-                                <input type="file" id="gradeFileInput" accept=".xlsx" class="form-control form-control-sm" style="display: none;" onchange="handleGradeFileSelect(event)">
-                                <div class="btn-group" role="group">
-                                    <button class="btn btn-sm btn-primary" onclick="importGrades('TP')">
-                                        <i class="fas fa-upload"></i> Import TP
-                                    </button>
-                                    <button class="btn btn-sm btn-primary" onclick="importGrades('TD')">
-                                        <i class="fas fa-upload"></i> Import TD
-                                    </button>
-                                    <button class="btn btn-sm btn-primary" onclick="importGrades('EXAM')">
-                                        <i class="fas fa-upload"></i> Import Exam
-                                    </button>
-                                </div>
+                            <div class="excel-buttons-group">
+                                <button class="import-btn import-exam" onclick="importGrades('EXAM')" title="Import Exam grades from Excel">
+                                    <i class="fas fa-file-import"></i> Exam
+                                </button>
+                                <button class="import-btn import-td" onclick="importGrades('TD')" title="Import TD grades from Excel">
+                                    <i class="fas fa-file-import"></i> TD
+                                </button>
+                                <button class="import-btn import-tp" onclick="importGrades('TP')" title="Import TP grades from Excel">
+                                    <i class="fas fa-file-import"></i> TP
+                                </button>
                             </div>
+                            <a href="#" class="download-template-link" onclick="exportGradeTemplate(); return false;">
+                                <i class="fas fa-download"></i> Download Template
+                            </a>
+                            <input type="file" id="gradeFileInput" accept=".xlsx" class="form-control form-control-sm" style="display: none;" onchange="handleGradeFileSelect(event)">
                         </div>
-                        <div class="col-md-6 text-end">
-                            <button class="btn btn-success" onclick="saveAllGrades()">
-                                <i class="fas fa-save"></i> Save All Grades
-                            </button>
-                        </div>
+                    </div>
+                    
+                    <div class="actions-right">
+                        <button class="btn-save-all" onclick="saveAllGrades()">
+                            <i class="fas fa-save"></i> Save All Grades
+                        </button>
                     </div>
                 </div>
             `;
@@ -621,6 +1018,243 @@
             .catch(error => {
                 event.target.value = '';
                 alert('Error importing grades: ' + error.message);
+            });
+        }
+        
+        // New Excel Import Functions for Card Buttons
+        function downloadTemplate(cardElement, gradeType) {
+            const subjectId = cardElement.getAttribute('data-subject-id');
+            const classId = cardElement.getAttribute('data-class-id');
+            const groupId = cardElement.getAttribute('data-group-id');
+            const semester = cardElement.getAttribute('data-semester');
+            
+            let url = `/api/excel/grades/template?subjectId=${subjectId}&classId=${classId}&semester=${semester}&gradeType=${gradeType}`;
+            if (groupId && groupId !== 'null') {
+                url += `&groupId=${groupId}`;
+            }
+            
+            window.location.href = url;
+            showToast('Downloading template...');
+        }
+        
+        function uploadExcelGrades(cardElement, gradeType) {
+            const subjectId = cardElement.getAttribute('data-subject-id');
+            const classId = cardElement.getAttribute('data-class-id');
+            const groupId = cardElement.getAttribute('data-group-id');
+            const semester = cardElement.getAttribute('data-semester');
+            const assignmentId = cardElement.getAttribute('data-assignment-id');
+            
+            // Create hidden file input
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.xlsx';
+            fileInput.style.display = 'none';
+            
+            fileInput.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                if (!file.name.endsWith('.xlsx')) {
+                    alert('Please select an Excel file (.xlsx)');
+                    return;
+                }
+                
+                // Show loading indicator
+                const loadingToast = document.createElement('div');
+                loadingToast.className = 'alert alert-info position-fixed top-0 end-0 m-3';
+                loadingToast.style.zIndex = '9999';
+                loadingToast.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading and processing...';
+                document.body.appendChild(loadingToast);
+                
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    
+                    let url = `/api/excel/grades/import?subjectId=${subjectId}&gradeType=${gradeType}&semester=${semester}&academicYear=2024-2025&classId=${classId}`;
+                    if (groupId && groupId !== 'null') {
+                        url += `&groupId=${groupId}`;
+                    }
+                    
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'include'
+                    });
+                    
+                    loadingToast.remove();
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const result = await response.json();
+                    showImportResultModal(result, gradeType);
+                    
+                    // Refresh grades if in modal
+                    if (currentAssignmentId == assignmentId) {
+                        loadStudentGrades(currentAssignmentId, currentGroupId);
+                    }
+                } catch (error) {
+                    loadingToast.remove();
+                    alert('Error uploading file: ' + error.message);
+                }
+                
+                document.body.removeChild(fileInput);
+            };
+            
+            document.body.appendChild(fileInput);
+            fileInput.click();
+        }
+        
+        function showImportResultModal(result, gradeType) {
+            const modalHtml = `
+                <div class="modal fade" id="importResultModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header bg-light">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-file-excel text-success"></i> Import Results - ${gradeType}
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-3">
+                                        <div class="text-center p-3 border rounded bg-light">
+                                            <div class="fs-3 fw-bold text-primary">${result.totalRows}</div>
+                                            <div class="small text-muted">Total Rows</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-center p-3 border rounded" style="background: #d4edda;">
+                                            <div class="fs-3 fw-bold text-success">${result.successCount}</div>
+                                            <div class="small text-muted">Success</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-center p-3 border rounded" style="background: #f8d7da;">
+                                            <div class="fs-3 fw-bold text-danger">${result.errorCount}</div>
+                                            <div class="small text-muted">Errors</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-center p-3 border rounded" style="background: #fff3cd;">
+                                            <div class="fs-3 fw-bold text-warning">${result.skippedCount}</div>
+                                            <div class="small text-muted">Skipped</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                ${result.successCount > 0 ? `
+                                <div class="mb-4">
+                                    <h6 class="text-success border-bottom pb-2">
+                                        <i class="fas fa-check-circle"></i> Successful Imports (${result.successCount})
+                                    </h6>
+                                    <div style="max-height: 200px; overflow-y: auto;" class="border rounded">
+                                        <table class="table table-sm table-hover mb-0">
+                                            <thead class="table-light sticky-top">
+                                                <tr>
+                                                    <th style="width: 60px;">Row</th>
+                                                    <th style="width: 120px;">Student ID</th>
+                                                    <th>Name</th>
+                                                    <th style="width: 80px;">Grade</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${result.successfulImports.map(row => `
+                                                    <tr>
+                                                        <td class="text-muted">${row.rowNumber}</td>
+                                                        <td><span class="badge bg-secondary">${row.matricule}</span></td>
+                                                        <td>${row.nom} ${row.prenom}</td>
+                                                        <td><span class="badge bg-success">${row.note}</span></td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                ` : ''}
+                                
+                                ${result.errorCount > 0 ? `
+                                <div class="mb-4">
+                                    <h6 class="text-danger border-bottom pb-2">
+                                        <i class="fas fa-exclamation-circle"></i> Errors (${result.errorCount})
+                                    </h6>
+                                    <div style="max-height: 200px; overflow-y: auto;" class="border rounded">
+                                        <table class="table table-sm table-hover mb-0">
+                                            <thead class="table-light sticky-top">
+                                                <tr>
+                                                    <th style="width: 60px;">Row</th>
+                                                    <th style="width: 120px;">Student ID</th>
+                                                    <th>Name</th>
+                                                    <th>Error Message</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${result.errors.map(row => `
+                                                    <tr>
+                                                        <td class="text-muted">${row.rowNumber}</td>
+                                                        <td><span class="badge bg-secondary">${row.matricule || 'N/A'}</span></td>
+                                                        <td>${row.nom || ''} ${row.prenom || ''}</td>
+                                                        <td class="text-danger small">${row.message}</td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                ` : ''}
+                                
+                                ${result.skippedCount > 0 ? `
+                                <div class="mb-3">
+                                    <h6 class="text-warning border-bottom pb-2">
+                                        <i class="fas fa-info-circle"></i> Skipped Rows (${result.skippedCount})
+                                    </h6>
+                                    <div style="max-height: 150px; overflow-y: auto;" class="border rounded">
+                                        <table class="table table-sm table-hover mb-0">
+                                            <thead class="table-light sticky-top">
+                                                <tr>
+                                                    <th style="width: 60px;">Row</th>
+                                                    <th>Reason</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${result.skipped.map(row => `
+                                                    <tr>
+                                                        <td class="text-muted">${row.rowNumber}</td>
+                                                        <td class="text-muted small">${row.message}</td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                                    <i class="fas fa-check"></i> Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove any existing modal
+            const existingModal = document.getElementById('importResultModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Add and show new modal
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById('importResultModal'));
+            modal.show();
+            
+            // Cleanup on hide
+            document.getElementById('importResultModal').addEventListener('hidden.bs.modal', function () {
+                this.remove();
             });
         }
     </script>
