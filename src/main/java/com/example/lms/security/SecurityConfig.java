@@ -56,7 +56,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
                 // Public pages
-                .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/uploads/**", "/h2-console/**").permitAll()
+                .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/uploads/**").permitAll()
                 
                 // API endpoints
                 .requestMatchers("/api/auth/**").permitAll()
@@ -89,9 +89,6 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-        // For H2 console
-        http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
 
         return http.build();
     }
