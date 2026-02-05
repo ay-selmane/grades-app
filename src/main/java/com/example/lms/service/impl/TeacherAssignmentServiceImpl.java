@@ -2,6 +2,10 @@ package com.example.lms.service.impl;
 
 import com.example.lms.dto.TeacherAssignmentDTO;
 import com.example.lms.model.TeacherAssignment;
+import com.example.lms.model.Teacher;
+import com.example.lms.model.StudentClass;
+import com.example.lms.model.Subject;
+import com.example.lms.model.Group;
 import com.example.lms.repository.*;
 import com.example.lms.service.TeacherAssignmentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,17 +58,43 @@ public class TeacherAssignmentServiceImpl implements TeacherAssignmentService {
 
     @Override
     public TeacherAssignment createAssignment(TeacherAssignmentDTO dto) {
-        TeacherAssignment assignment = new TeacherAssignment();
-        assignment.setTeacher(teacherRepository.findById(dto.getTeacherId()).orElseThrow());
-        assignment.setStudentClass(classRepository.findById(dto.getClassId()).orElseThrow());
-        assignment.setSubject(subjectRepository.findById(dto.getSubjectId()).orElseThrow());
-        if (dto.getGroupId() != null) {
-            assignment.setGroup(groupRepository.findById(dto.getGroupId()).orElse(null));
-        }
-        assignment.setSemester(dto.getSemester());
-        assignment.setAcademicYear(dto.getAcademicYear());
+        Teacher teacher = teacherRepository.findById(dto.getTeacherId()).orElseThrow();
+        StudentClass studentClass = classRepository.findById(dto.getClassId()).orElseThrow();
+        Subject subject = subjectRepository.findById(dto.getSubjectId()).orElseThrow();
         
-        return assignmentRepository.save(assignment);
+        // If no specific group selected, create assignments for ALL groups in the class
+        if (dto.getGroupId() == null) {
+            List<Group> groups = groupRepository.findAll().stream()
+                    .filter(g -> g.getStudentClass() != null && 
+                               g.getStudentClass().getId().equals(studentClass.getId()))
+                    .toList();
+            
+            // Create assignment for each group
+            for (Group group : groups) {
+                TeacherAssignment assignment = new TeacherAssignment();
+                assignment.setTeacher(teacher);
+                assignment.setStudentClass(studentClass);
+                assignment.setSubject(subject);
+                assignment.setGroup(group);
+                assignment.setSemester(dto.getSemester());
+                assignment.setAcademicYear(dto.getAcademicYear());
+                assignmentRepository.save(assignment);
+            }
+            
+            // Return the first one (for API response)
+            return groups.isEmpty() ? null : assignmentRepository.findByTeacherId(teacher.getId()).get(0);
+        } else {
+            // Create single assignment for specific group
+            TeacherAssignment assignment = new TeacherAssignment();
+            assignment.setTeacher(teacher);
+            assignment.setStudentClass(studentClass);
+            assignment.setSubject(subject);
+            assignment.setGroup(groupRepository.findById(dto.getGroupId()).orElse(null));
+            assignment.setSemester(dto.getSemester());
+            assignment.setAcademicYear(dto.getAcademicYear());
+            
+            return assignmentRepository.save(assignment);
+        }
     }
 
     @Override
